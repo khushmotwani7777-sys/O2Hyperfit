@@ -126,7 +126,7 @@ export default function ProgressPage() {
         user?.role !== "MEMBER" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Log Measurements
@@ -165,7 +165,7 @@ export default function ProgressPage() {
               {weightChange && (
                 <span
                   className={`text-xs font-bold flex items-center ${
-                    parseFloat(weightChange) <= 0 ? "text-emerald-600" : "text-amber-600"
+                    parseFloat(weightChange) <= 0 ? "text-brand-600" : "text-amber-600"
                   }`}
                 >
                   {parseFloat(weightChange) <= 0 ? (
@@ -198,7 +198,7 @@ export default function ProgressPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Arms (Flexed)</span>
-            <span className="text-2xl font-black text-emerald-600">
+            <span className="text-2xl font-black text-brand-600">
               {latest.armsCm ? `${latest.armsCm} cm` : "N/A"}
             </span>
             <p className="text-[11px] text-slate-400 mt-1">Bicep peak circumference</p>
@@ -215,7 +215,7 @@ export default function ProgressPage() {
 
         {loading ? (
           <div className="p-12 flex justify-center">
-            <Loader2 className="h-7 w-7 text-emerald-500 animate-spin" />
+            <Loader2 className="h-7 w-7 text-brand-500 animate-spin" />
           </div>
         ) : records.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-xs">No progress logs recorded yet.</div>
@@ -240,7 +240,7 @@ export default function ProgressPage() {
                   <tr key={r.id} className="hover:bg-slate-50/60">
                     <td className="py-3 px-4 font-semibold text-slate-800">{new Date(r.date).toLocaleDateString()}</td>
                     <td className="py-3 px-4 text-slate-700">{r.member?.fullName}</td>
-                    <td className="py-3 px-4 font-bold text-emerald-600">{r.weightKg} kg</td>
+                    <td className="py-3 px-4 font-bold text-brand-600">{r.weightKg} kg</td>
                     <td className="py-3 px-4">{r.bodyFatPercentage ? `${r.bodyFatPercentage}%` : "-"}</td>
                     <td className="py-3 px-4">{r.chestCm ? `${r.chestCm} cm` : "-"}</td>
                     <td className="py-3 px-4">{r.waistCm ? `${r.waistCm} cm` : "-"}</td>
@@ -388,7 +388,7 @@ export default function ProgressPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Measurements"}
             </button>

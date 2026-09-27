@@ -151,7 +151,7 @@ export default function MembersPage() {
         user?.role === "ADMIN" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Add New Member
@@ -168,7 +168,7 @@ export default function MembersPage() {
             placeholder="Search by name, ID, email, or phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
           />
         </form>
 
@@ -176,7 +176,7 @@ export default function MembersPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-hidden focus:ring-2 focus:ring-brand-500"
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">Active</option>
@@ -190,7 +190,7 @@ export default function MembersPage() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 flex justify-center">
-            <Loader2 className="h-7 w-7 text-emerald-500 animate-spin" />
+            <Loader2 className="h-7 w-7 text-brand-500 animate-spin" />
           </div>
         ) : members.length === 0 ? (
           <div className="p-12 text-center text-slate-400">
@@ -238,7 +238,7 @@ export default function MembersPage() {
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/members/${m.id}`}
-                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition"
+                          className="p-1.5 rounded-lg bg-brand-50 text-brand-700 hover:bg-brand-100 transition"
                           title="View Full Profile"
                         >
                           <Eye className="h-4 w-4" />
@@ -285,7 +285,7 @@ export default function MembersPage() {
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 placeholder="e.g. John Doe"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
@@ -296,7 +296,7 @@ export default function MembersPage() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="john@example.com"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
@@ -310,7 +310,7 @@ export default function MembersPage() {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="+91 98765 43210"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
@@ -318,7 +318,7 @@ export default function MembersPage() {
               <select
                 value={formData.gender}
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               >
                 <option value="MALE">Male</option>
                 <option value="FEMALE">Female</option>
@@ -334,7 +334,7 @@ export default function MembersPage() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
@@ -344,7 +344,7 @@ export default function MembersPage() {
                 value={formData.height}
                 onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                 placeholder="175"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
@@ -355,7 +355,7 @@ export default function MembersPage() {
                 value={formData.weight}
                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                 placeholder="70.5"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
@@ -366,7 +366,7 @@ export default function MembersPage() {
               <select
                 value={formData.assignedTrainerId}
                 onChange={(e) => setFormData({ ...formData, assignedTrainerId: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               >
                 <option value="">None / Unassigned</option>
                 {trainers.map((t) => (
@@ -383,7 +383,7 @@ export default function MembersPage() {
                 value={formData.emergencyContact}
                 onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
                 placeholder="Contact Name - +91 99999..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
@@ -395,7 +395,7 @@ export default function MembersPage() {
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="Full street address..."
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -406,7 +406,7 @@ export default function MembersPage() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Leave blank for Member@123"
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -421,7 +421,7 @@ export default function MembersPage() {
             <button
               type="submit"
               disabled={creating}
-              className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Member"}
             </button>

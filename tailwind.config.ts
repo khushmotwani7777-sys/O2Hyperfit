@@ -11,24 +11,42 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          200: "#bbf7d0",
-          300: "#86efac",
-          400: "#4ade80",
-          500: "#22c55e",
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
-          950: "#052e16",
+          50: "#fff4ed",
+          100: "#ffe6d5",
+          200: "#fecca9",
+          300: "#fda772",
+          400: "#fb7738",
+          500: "#FF4612", // Official O2 HyperFit vibrant orange-red accent
+          600: "#e63507",
+          700: "#bf2506",
+          800: "#98200b",
+          900: "#7b1d0d",
+          950: "#430b04",
         },
         dark: {
-          800: "#1e293b",
-          850: "#172033",
-          900: "#0f172a",
-          950: "#020617",
-        }
+          700: "#262626",
+          750: "#1f1f1f",
+          800: "#1a1a1a",
+          850: "#151515", // Dark charcoal
+          900: "#111111",
+          950: "#0A0A0A", // Primary near-black
+        },
+        surface: {
+          50: "#FFFFFF",
+          100: "#FBFBFB",
+          200: "#F5F5F5", // Light content background
+          300: "#EAEAEA",
+        },
+      },
+      fontFamily: {
+        sans: [
+          "Inter",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
       },
     },
   },

@@ -128,7 +128,7 @@ export default function AssessmentsPage() {
         user?.role !== "MEMBER" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <UploadCloud className="h-4 w-4" />
             Upload Machine PDF
@@ -145,7 +145,7 @@ export default function AssessmentsPage() {
             placeholder="Search member, report name, notes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
           />
         </div>
         <div className="text-xs text-slate-500">
@@ -156,7 +156,7 @@ export default function AssessmentsPage() {
       {/* Reports Grid */}
       {loading ? (
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-brand-500 animate-spin" />
         </div>
       ) : filteredAssessments.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400">
@@ -173,7 +173,7 @@ export default function AssessmentsPage() {
             >
               <div>
                 <div className="flex items-start justify-between mb-3">
-                  <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                  <div className="p-3 bg-brand-50 text-brand-600 rounded-xl">
                     <FileText className="h-6 w-6" />
                   </div>
                   {user?.role !== "MEMBER" && (
@@ -188,7 +188,7 @@ export default function AssessmentsPage() {
                 </div>
 
                 <h3 className="font-bold text-slate-800 text-sm mb-1">{ass.member?.fullName}</h3>
-                <p className="font-mono text-xs text-emerald-600 font-semibold mb-2">{ass.member?.memberId}</p>
+                <p className="font-mono text-xs text-brand-600 font-semibold mb-2">{ass.member?.memberId}</p>
 
                 <div className="space-y-1.5 text-xs text-slate-500 mb-3">
                   <p className="flex items-center gap-1.5">
@@ -215,7 +215,7 @@ export default function AssessmentsPage() {
                   href={ass.pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-xs"
+                  className="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-xs"
                 >
                   <Download className="h-3.5 w-3.5" />
                   View PDF
@@ -274,7 +274,7 @@ export default function AssessmentsPage() {
               accept=".pdf,application/pdf"
               required
               onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-emerald-100"
             />
             <p className="text-[11px] text-slate-400 mt-1">
               Supports InBody, Tanita, Accuniq or any standard body analyzer PDF. File will be securely archived.
@@ -303,7 +303,7 @@ export default function AssessmentsPage() {
             <button
               type="submit"
               disabled={uploading}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Upload Report"}
             </button>

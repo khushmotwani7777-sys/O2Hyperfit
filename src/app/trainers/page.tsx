@@ -100,7 +100,7 @@ export default function TrainersPage() {
       actions={
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+          className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
         >
           <Plus className="h-4 w-4" />
           Add Trainer
@@ -109,7 +109,7 @@ export default function TrainersPage() {
     >
       {loading ? (
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-brand-500 animate-spin" />
         </div>
       ) : trainers.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400">
@@ -156,7 +156,7 @@ export default function TrainersPage() {
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span className="flex items-center gap-1.5 font-medium">
-                  <Users className="h-3.5 w-3.5 text-emerald-500" />
+                  <Users className="h-3.5 w-3.5 text-brand-500" />
                   {t._count?.members || 0} Members Assigned
                 </span>
                 <span className="flex items-center gap-1.5 font-medium">
@@ -265,7 +265,7 @@ export default function TrainersPage() {
             <button
               type="submit"
               disabled={creating}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Trainer"}
             </button>

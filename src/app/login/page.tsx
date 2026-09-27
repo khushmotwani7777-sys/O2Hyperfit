@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Dumbbell, ShieldCheck, UserCheck, ArrowRight, Loader2, Sparkles, Key } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, ArrowRight, Loader2, ShieldCheck, UserCheck, Dumbbell, Key } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
@@ -37,29 +39,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-teal-500/10 blur-[100px] pointer-events-none rounded-full" />
+    <div className="min-h-screen bg-dark-950 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden text-white selection:bg-brand-500 selection:text-white">
+      {/* Background Subtle Orange-Red Ambient Glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-brand-500/15 blur-[140px] pointer-events-none rounded-full" />
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="flex justify-center mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-xl shadow-emerald-500/30">
-            <Dumbbell className="h-7 w-7 text-white" />
-          </div>
+      {/* Return to Home link */}
+      <div className="absolute top-6 left-6 z-20">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-dark-900 border border-dark-700 hover:border-brand-500/50 text-slate-300 hover:text-white text-xs font-semibold transition"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Landing Page</span>
+        </Link>
+      </div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 flex flex-col items-center">
+        {/* Exact Uploaded Brand Logo */}
+        <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-4 drop-shadow-[0_10px_25px_rgba(255,70,18,0.2)]">
+          <Image
+            src="/logo.png"
+            alt="O2 HyperFit Official Logo"
+            fill
+            priority
+            className="object-contain"
+            sizes="(max-width: 640px) 96px, 112px"
+          />
         </div>
-        <h2 className="text-center text-3xl font-black tracking-tight text-white">
-          O2HYPERFIT
+
+        {/* Headlines */}
+        <h2 className="text-center text-3xl sm:text-4xl font-black tracking-tight uppercase text-white leading-tight">
+          TRAIN. TRACK. <br />
+          <span className="text-brand-500">TRANSFORM.</span>
         </h2>
-        <p className="mt-1 text-center text-sm font-medium text-emerald-400">
-          Gym & Body Assessment Management System
+        <p className="mt-2 text-center text-xs sm:text-sm text-slate-300 font-medium">
+          Your fitness journey, managed in one place.
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
-        <div className="bg-slate-900/90 backdrop-blur-xl py-8 px-6 shadow-2xl rounded-3xl border border-slate-800 sm:px-10">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-dark-900/95 backdrop-blur-xl py-8 px-6 shadow-2xl rounded-3xl border border-dark-700 sm:px-10">
           {error && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm font-medium flex items-center gap-2">
+            <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               {error}
             </div>
@@ -67,7 +88,7 @@ export default function LoginPage() {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Email Address
               </label>
               <input
@@ -76,12 +97,12 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@o2hyperfit.com"
-                className="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm transition"
+                className="w-full px-4 py-3 rounded-xl bg-dark-800 border border-dark-700 text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Password
               </label>
               <input
@@ -90,33 +111,33 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm transition"
+                className="w-full px-4 py-3 rounded-xl bg-dark-800 border border-dark-700 text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 shadow-lg shadow-emerald-500/25 transition disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 focus:outline-hidden focus:ring-2 focus:ring-brand-500 shadow-xl shadow-brand-500/25 transition disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Signing In...
+                  AUTHENTICATING...
                 </>
               ) : (
                 <>
-                  Sign In to System
+                  LOGIN
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Quick Demo Logins Section */}
-          <div className="mt-8 pt-6 border-t border-slate-800">
+          {/* 1-Click Quick Demo Access */}
+          <div className="mt-8 pt-6 border-t border-dark-800">
             <div className="flex items-center gap-2 mb-3">
-              <Key className="h-3.5 w-3.5 text-emerald-400" />
+              <Key className="h-3.5 w-3.5 text-brand-500" />
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 1-Click Quick Demo Access
               </p>
@@ -126,32 +147,32 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleQuickLogin("admin@o2hyperfit.com", "Admin@123")}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-purple-950/40 border border-slate-700 hover:border-purple-500/50 text-slate-200 hover:text-purple-300 transition text-xs font-medium cursor-pointer"
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-dark-800 hover:bg-dark-750 border border-dark-700 hover:border-brand-500/50 text-slate-200 hover:text-white transition text-xs font-medium cursor-pointer"
               >
-                <ShieldCheck className="h-4 w-4 text-purple-400 mb-1" />
+                <ShieldCheck className="h-4 w-4 text-brand-500 mb-1" />
                 <span>Admin</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin("trainer@o2hyperfit.com", "Trainer@123")}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-blue-950/40 border border-slate-700 hover:border-blue-500/50 text-slate-200 hover:text-blue-300 transition text-xs font-medium cursor-pointer"
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-dark-800 hover:bg-dark-750 border border-dark-700 hover:border-brand-500/50 text-slate-200 hover:text-white transition text-xs font-medium cursor-pointer"
               >
-                <UserCheck className="h-4 w-4 text-blue-400 mb-1" />
+                <UserCheck className="h-4 w-4 text-brand-500 mb-1" />
                 <span>Trainer</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin("member@o2hyperfit.com", "Member@123")}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-emerald-950/40 border border-slate-700 hover:border-emerald-500/50 text-slate-200 hover:text-emerald-300 transition text-xs font-medium cursor-pointer"
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-dark-800 hover:bg-dark-750 border border-dark-700 hover:border-brand-500/50 text-slate-200 hover:text-white transition text-xs font-medium cursor-pointer"
               >
-                <Dumbbell className="h-4 w-4 text-emerald-400 mb-1" />
+                <Dumbbell className="h-4 w-4 text-brand-500 mb-1" />
                 <span>Member</span>
               </button>
             </div>
             <p className="text-[11px] text-center text-slate-400 mt-3">
-              Click any role above to automatically authenticate with pre-seeded data.
+              Select any role above to instantly authenticate with pre-seeded database records.
             </p>
           </div>
         </div>

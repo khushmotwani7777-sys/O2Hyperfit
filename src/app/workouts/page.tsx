@@ -173,7 +173,7 @@ export default function WorkoutsPage() {
         user?.role !== "MEMBER" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Build Workout Plan
@@ -183,7 +183,7 @@ export default function WorkoutsPage() {
     >
       {loading ? (
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-brand-500 animate-spin" />
         </div>
       ) : workoutPlans.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400">
@@ -245,7 +245,7 @@ export default function WorkoutsPage() {
 
                     <div className="flex items-center justify-between text-slate-700 bg-white p-2.5 rounded-xl border border-slate-100 font-medium">
                       <span>{item.sets} Sets × {item.reps} Reps</span>
-                      <span className="font-bold text-emerald-600">
+                      <span className="font-bold text-brand-600">
                         {item.weightKg ? `${item.weightKg} kg` : "Bodyweight"}
                       </span>
                     </div>
@@ -313,7 +313,7 @@ export default function WorkoutsPage() {
               <button
                 type="button"
                 onClick={addExerciseRow}
-                className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-semibold flex items-center gap-1 hover:bg-emerald-100"
+                className="px-3 py-1 bg-brand-50 text-brand-700 rounded-lg font-semibold flex items-center gap-1 hover:bg-brand-100"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add Exercise
@@ -433,7 +433,7 @@ export default function WorkoutsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Workout Plan"}
             </button>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { useAuth } from "@/context/AuthContext";
@@ -34,9 +35,20 @@ export function AppLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white gap-3">
-        <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
-        <p className="text-sm font-medium text-slate-400">Loading O2Hyperfit...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-dark-950 text-white gap-4">
+        <div className="relative w-16 h-16 animate-pulse">
+          <Image
+            src="/logo.png"
+            alt="O2 HyperFit"
+            fill
+            className="object-contain"
+            sizes="64px"
+          />
+        </div>
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+          <Loader2 className="h-4 w-4 text-brand-500 animate-spin" />
+          <span>Loading O2 HyperFit...</span>
+        </div>
       </div>
     );
   }
@@ -48,18 +60,18 @@ export function AppLayout({
   // Check role restrictions
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center border border-slate-100">
-          <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 font-bold text-xl">
+      <div className="min-h-screen flex items-center justify-center bg-dark-950 p-6">
+        <div className="bg-dark-900 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border border-dark-700">
+          <div className="w-12 h-12 rounded-full bg-brand-500/20 text-brand-500 flex items-center justify-center mx-auto mb-4 font-black text-xl">
             !
           </div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Access Restricted</h2>
-          <p className="text-sm text-slate-500 mb-6">
-            Your current account role (<span className="font-semibold">{user.role}</span>) does not have access to this section.
+          <h2 className="text-xl font-black text-white uppercase tracking-tight mb-2">Access Restricted</h2>
+          <p className="text-xs text-slate-400 mb-6">
+            Your current account role (<span className="font-bold text-brand-500">{user.role}</span>) does not have authorization to view this section.
           </p>
           <button
             onClick={() => router.push("/dashboard")}
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition"
+            className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-lg shadow-brand-500/25"
           >
             Return to Dashboard
           </button>
@@ -69,7 +81,7 @@ export function AppLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#F5F5F5]">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <div className="lg:pl-64 flex flex-col min-h-screen">

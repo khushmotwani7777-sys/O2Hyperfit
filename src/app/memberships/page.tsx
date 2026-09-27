@@ -138,7 +138,7 @@ export default function MembershipsPage() {
           </button>
           <button
             onClick={() => setIsAssignModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Assign Subscription
@@ -149,7 +149,7 @@ export default function MembershipsPage() {
       {/* Plans Showcase Grid */}
       <div className="mb-10">
         <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <CreditCard className="h-4 w-4 text-emerald-600" />
+          <CreditCard className="h-4 w-4 text-brand-600" />
           Active Gym Plans Catalog
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -161,7 +161,7 @@ export default function MembershipsPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-slate-800 text-sm">{p.name}</h3>
-                  <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                  <span className="text-[11px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">
                     {p.durationMonths} Mo
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export default function MembershipsPage() {
 
         {loading ? (
           <div className="p-12 flex justify-center">
-            <Loader2 className="h-7 w-7 text-emerald-500 animate-spin" />
+            <Loader2 className="h-7 w-7 text-brand-500 animate-spin" />
           </div>
         ) : memberships.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-xs">No subscriptions found for this filter.</div>
@@ -231,7 +231,7 @@ export default function MembershipsPage() {
                     <td className="py-3.5 px-4 text-slate-600">{new Date(m.endDate).toLocaleDateString()}</td>
                     <td className="py-3.5 px-4">
                       {m.autoRenew ? (
-                        <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px] font-medium">Auto-renew ON</span>
+                        <span className="text-brand-700 bg-brand-50 px-2 py-0.5 rounded text-[11px] font-medium">Auto-renew ON</span>
                       ) : (
                         <span className="text-slate-400 text-[11px]">Manual</span>
                       )}
@@ -312,7 +312,7 @@ export default function MembershipsPage() {
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold"
             >
               Save Plan
             </button>
@@ -378,7 +378,7 @@ export default function MembershipsPage() {
               id="autoRenew"
               checked={assignForm.autoRenew}
               onChange={(e) => setAssignForm({ ...assignForm, autoRenew: e.target.checked })}
-              className="rounded text-emerald-500"
+              className="rounded text-brand-500"
             />
             <label htmlFor="autoRenew" className="text-slate-700 font-medium">Enable Auto-Renewal</label>
           </div>
@@ -393,7 +393,7 @@ export default function MembershipsPage() {
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold"
             >
               Assign Subscription
             </button>

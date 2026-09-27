@@ -114,7 +114,7 @@ export default function AttendancePage() {
         user?.role !== "MEMBER" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Check In Member
@@ -128,10 +128,10 @@ export default function AttendancePage() {
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-xs flex items-center justify-between">
             <div>
               <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Currently Working Out</span>
-              <span className="text-3xl font-black text-emerald-600">{activeInGymCount}</span>
+              <span className="text-3xl font-black text-brand-600">{activeInGymCount}</span>
               <p className="text-xs text-slate-500 mt-1">Checked in & on the floor</p>
             </div>
-            <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <div className="p-4 rounded-2xl bg-brand-50 text-brand-600 border border-brand-100">
               <UserCheck className="h-7 w-7" />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function AttendancePage() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 flex justify-center">
-            <Loader2 className="h-7 w-7 text-emerald-500 animate-spin" />
+            <Loader2 className="h-7 w-7 text-brand-500 animate-spin" />
           </div>
         ) : attendance.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-xs">No attendance entries recorded for this date.</div>
@@ -205,12 +205,12 @@ export default function AttendancePage() {
                         <div className="text-[11px] text-slate-500">{a.member.memberId}</div>
                       </td>
                       <td className="py-3.5 px-4 text-slate-600">{new Date(a.date).toLocaleDateString()}</td>
-                      <td className="py-3.5 px-4 font-mono font-semibold text-emerald-700">{checkInFormatted}</td>
+                      <td className="py-3.5 px-4 font-mono font-semibold text-brand-700">{checkInFormatted}</td>
                       <td className="py-3.5 px-4 font-mono">
                         {checkOutFormatted ? (
                           <span className="text-slate-600">{checkOutFormatted}</span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 animate-pulse">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200 animate-pulse">
                             Active Inside
                           </span>
                         )}
@@ -285,7 +285,7 @@ export default function AttendancePage() {
             <button
               type="submit"
               disabled={checkingIn}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {checkingIn ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Check-In"}
             </button>

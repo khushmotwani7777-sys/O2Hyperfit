@@ -58,7 +58,7 @@ export default function ProfilePage() {
               </div>
               <p className="text-slate-500 text-xs mt-1">{user?.email}</p>
               {user?.memberProfile && (
-                <p className="text-xs font-mono font-bold text-emerald-600 mt-1">
+                <p className="text-xs font-mono font-bold text-brand-600 mt-1">
                   Member ID: {user.memberProfile.memberId}
                 </p>
               )}
@@ -99,7 +99,7 @@ export default function ProfilePage() {
               <Calendar className="h-5 w-5 text-slate-400" />
               <div>
                 <span className="text-[11px] text-slate-400 block">Account Status</span>
-                <span className="font-semibold text-emerald-600">Active & Verified</span>
+                <span className="font-semibold text-brand-600">Active & Verified</span>
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function ProfilePage() {
         {/* Change Password Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xs">
           <div className="flex items-center gap-2 mb-4">
-            <Key className="h-5 w-5 text-emerald-600" />
+            <Key className="h-5 w-5 text-brand-600" />
             <h3 className="text-base font-bold text-slate-800">Change Account Password</h3>
           </div>
 
@@ -116,7 +116,7 @@ export default function ProfilePage() {
             <div
               className={`mb-4 p-3.5 rounded-xl text-xs font-medium ${
                 statusMsg.type === "success"
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  ? "bg-brand-50 text-brand-700 border border-brand-200"
                   : "bg-rose-50 text-rose-700 border border-rose-200"
               }`}
             >
@@ -166,7 +166,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition"
+              className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Password"}
             </button>

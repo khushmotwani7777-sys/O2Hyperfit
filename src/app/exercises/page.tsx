@@ -94,7 +94,7 @@ export default function ExercisesPage() {
         user?.role !== "MEMBER" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Add Exercise
@@ -117,7 +117,7 @@ export default function ExercisesPage() {
             placeholder="Search exercises or equipment..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
           />
         </form>
 
@@ -153,7 +153,7 @@ export default function ExercisesPage() {
       {/* Exercises Grid */}
       {loading ? (
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-brand-500 animate-spin" />
         </div>
       ) : exercises.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl border border-slate-100 text-center text-slate-400">
@@ -170,7 +170,7 @@ export default function ExercisesPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-slate-800 text-sm">{ex.name}</h3>
-                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                  <span className="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md">
                     {ex.muscleGroup}
                   </span>
                 </div>
@@ -293,7 +293,7 @@ export default function ExercisesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Exercise"}
             </button>

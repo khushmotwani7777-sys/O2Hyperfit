@@ -116,7 +116,7 @@ export default function PaymentsPage() {
         user?.role === "ADMIN" && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
           >
             <Plus className="h-4 w-4" />
             Record Payment
@@ -133,7 +133,7 @@ export default function PaymentsPage() {
               <span className="text-3xl font-black text-slate-800 tracking-tight">₹{stats.totalRevenue.toLocaleString()}</span>
               <p className="text-xs text-slate-500 mt-1">Across all matching payment methods</p>
             </div>
-            <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <div className="p-4 rounded-2xl bg-brand-50 text-brand-600 border border-brand-100">
               <IndianRupee className="h-7 w-7" />
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function PaymentsPage() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 flex justify-center">
-            <Loader2 className="h-7 w-7 text-emerald-500 animate-spin" />
+            <Loader2 className="h-7 w-7 text-brand-500 animate-spin" />
           </div>
         ) : payments.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-xs">No payment records found.</div>
@@ -308,7 +308,7 @@ export default function PaymentsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Payment"}
             </button>
