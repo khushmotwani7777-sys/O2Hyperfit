@@ -1,0 +1,317 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  TRAINER
+  MEMBER
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum TrainerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  COMPLETED
+  PENDING
+  FAILED
+  REFUNDED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  EXCUSED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(MEMBER)
+  name         String
+  phone        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  memberProfile  Member?
+  trainerProfile Trainer?
+
+  uploadedAssessments BodyAssessment[] @relation("AssessmentUploader")
+  recordedProgress    ProgressRecord[] @relation("ProgressRecorder")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Trainer {
+  id              String        @id @default(uuid())
+  userId          String?       @unique
+  trainerId       String        @unique
+  name            String
+  email           String        @unique
+  phone           String
+  specialization  String
+  experienceYears Int           @default(0)
+  joiningDate     DateTime      @default(now())
+  status          TrainerStatus @default(ACTIVE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  members      Member[]
+  workoutPlans WorkoutPlan[]
+
+  @@index([status])
+}
+
+model Member {
+  id               String       @id @default(uuid())
+  userId           String?      @unique
+  memberId         String       @unique
+  fullName         String
+  email            String       @unique
+  phone            String
+  address          String?
+  dateOfBirth      DateTime?
+  gender           Gender       @default(OTHER)
+  height           Float?       // in cm
+  weight           Float?       // in kg
+  emergencyContact String?
+  joiningDate      DateTime     @default(now())
+  profilePhoto     String?
+  status           MemberStatus @default(ACTIVE)
+  assignedTrainerId String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  user            User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  assignedTrainer Trainer?         @relation(fields: [assignedTrainerId], references: [id], onDelete: SetNull)
+  memberships     Membership[]
+  payments        Payment[]
+  attendance      Attendance[]
+  workoutPlans    WorkoutPlan[]
+  progressRecords ProgressRecord[]
+  bodyAssessments BodyAssessment[]
+
+  @@index([status])
+  @@index([assignedTrainerId])
+  @@index([fullName])
+  @@index([email])
+}
+
+model MembershipPlan {
+  id             String       @id @default(uuid())
+  name           String
+  durationMonths Int
+  price          Float
+  description    String?
+  status         PlanStatus   @default(ACTIVE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  memberships Membership[]
+
+  @@index([status])
+}
+
+model Membership {
+  id          String           @id @default(uuid())
+  memberId    String
+  planId      String
+  startDate   DateTime
+  endDate     DateTime
+  status      MembershipStatus @default(ACTIVE)
+  autoRenew   Boolean          @default(false)
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  member   Member         @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  plan     MembershipPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+  payments Payment[]
+
+  @@index([memberId])
+  @@index([planId])
+  @@index([status])
+  @@index([endDate])
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  paymentId      String        @unique
+  memberId       String
+  membershipId   String?
+  amount         Float
+  paymentDate    DateTime      @default(now())
+  paymentMethod  PaymentMethod @default(CASH)
+  transactionRef String?
+  status         PaymentStatus @default(COMPLETED)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  member     Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  membership Membership? @relation(fields: [membershipId], references: [id], onDelete: SetNull)
+
+  @@index([memberId])
+  @@index([status])
+  @@index([paymentDate])
+  @@index([paymentMethod])
+}
+
+model Attendance {
+  id           String           @id @default(uuid())
+  memberId     String
+  date         DateTime         @default(now())
+  checkInTime  DateTime         @default(now())
+  checkOutTime DateTime?
+  status       AttendanceStatus @default(PRESENT)
+  notes        String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@index([date])
+  @@index([status])
+}
+
+model Exercise {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  category     String   // Strength, Cardio, Flexibility, etc.
+  muscleGroup  String   // Chest, Back, Legs, Shoulders, Arms, Core, Full Body
+  equipment    String?  // Barbell, Dumbbell, Machine, Bodyweight, Cable
+  description  String?
+  instructions String?
+  videoUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  workoutExercises WorkoutExercise[]
+
+  @@index([muscleGroup])
+  @@index([category])
+}
+
+model WorkoutPlan {
+  id        String    @id @default(uuid())
+  planName  String
+  memberId  String
+  trainerId String?
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  status    String    @default("ACTIVE") // ACTIVE, COMPLETED, ARCHIVED
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  member    Member            @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  trainer   Trainer?          @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  exercises WorkoutExercise[]
+
+  @@index([memberId])
+  @@index([trainerId])
+}
+
+model WorkoutExercise {
+  id            String   @id @default(uuid())
+  workoutPlanId String
+  exerciseId    String
+  dayOfWeek     String   // Monday, Tuesday, or Day 1, Day 2
+  sets          Int      @default(3)
+  reps          Int      @default(10)
+  weightKg      Float?   // Recommended weight in kg
+  restSeconds   Int      @default(60)
+  trainerNotes  String?
+  order         Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  exercise    Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
+
+  @@index([workoutPlanId])
+  @@index([exerciseId])
+}
+
+model ProgressRecord {
+  id                 String   @id @default(uuid())
+  memberId           String
+  date               DateTime @default(now())
+  weightKg           Float
+  bodyFatPercentage  Float?
+  chestCm            Float?
+  waistCm            Float?
+  armsCm             Float?
+  thighsCm           Float?
+  notes              String?
+  recordedById       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  member     Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  recordedBy User?  @relation("ProgressRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([memberId])
+  @@index([date])
+}
+
+model BodyAssessment {
+  id             String   @id @default(uuid())
+  memberId       String
+  assessmentDate DateTime @default(now())
+  pdfFileName    String
+  pdfUrl         String
+  pdfPath        String
+  uploadedById   String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  member     Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  uploadedBy User?  @relation("AssessmentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([memberId])
+  @@index([assessmentDate])
+}

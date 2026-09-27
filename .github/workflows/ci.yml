@@ -1,0 +1,62 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-and-build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: o2hyperfit_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/o2hyperfit_test?schema=public"
+      JWT_SECRET: "test-jwt-secret-key-at-least-32-characters-long"
+      NODE_ENV: test
+      STORAGE_PROVIDER: local
+      UPLOAD_DIR: "./uploads"
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: 3. Install dependencies
+        run: npm ci
+
+      - name: 4. Generate Prisma Client
+        run: npx prisma generate
+
+      - name: 5. Run Database Migrations
+        run: npx prisma db push --skip-generate
+
+      - name: 6. Run Linter
+        run: npm run lint
+
+      - name: 7. Run Automated Tests
+        run: npm run test
+
+      - name: 8. Build Application
+        run: npm run build

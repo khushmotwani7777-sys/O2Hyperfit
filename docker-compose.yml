@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: o2hyperfit-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: o2hyperfit
+    ports:
+      - "5432:5432"
+    volumes:
+      - o2hyperfit_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d o2hyperfit"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: o2hyperfit-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/o2hyperfit?schema=public
+      - JWT_SECRET=super-secret-jwt-key-for-o2hyperfit-production-at-least-32-chars
+      - NODE_ENV=production
+      - PORT=3000
+      - STORAGE_PROVIDER=local
+      - UPLOAD_DIR=/app/uploads
+      - NEXT_PUBLIC_APP_NAME=O2Hyperfit
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - o2hyperfit_uploads:/app/uploads
+
+volumes:
+  o2hyperfit_pgdata:
+    driver: local
+  o2hyperfit_uploads:
+    driver: local
