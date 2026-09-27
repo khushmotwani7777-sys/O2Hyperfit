@@ -16,6 +16,8 @@ import {
   Dumbbell,
   CheckCircle,
   AlertCircle,
+  Upload,
+  KeyRound,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -142,6 +144,25 @@ export default function MembersPage() {
     }
   };
 
+  const handleResetPassword = async (memberId: string, memberName: string, phone: string) => {
+    if (!confirm(`Reset temporary password for ${memberName} to their mobile number (${phone})?\n\nThey will be forced to create a new password on their next login.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/members/${memberId}/reset-password`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(data.message);
+      } else {
+        alert(data.error || "Failed to reset password");
+      }
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    }
+  };
+
   return (
     <AppLayout
       title="Member Management"
@@ -149,13 +170,22 @@ export default function MembersPage() {
       allowedRoles={["ADMIN", "TRAINER"]}
       actions={
         user?.role === "ADMIN" && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
-          >
-            <Plus className="h-4 w-4" />
-            Add New Member
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/members/import"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-dark-800 hover:bg-dark-700 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            >
+              <Upload className="h-4 w-4 text-brand-500" />
+              Import CSV
+            </Link>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-xs transition"
+            >
+              <Plus className="h-4 w-4" />
+              Add New Member
+            </button>
+          </div>
         )
       }
     >
@@ -243,6 +273,15 @@ export default function MembersPage() {
                         >
                           <Eye className="h-4 w-4" />
                         </Link>
+                        {user?.role === "ADMIN" && (
+                          <button
+                            onClick={() => handleResetPassword(m.id, m.fullName, m.phone)}
+                            className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition"
+                            title="Reset Password to Mobile Number"
+                          >
+                            <KeyRound className="h-4 w-4" />
+                          </button>
+                        )}
                         {user?.role === "ADMIN" && m.status === "ACTIVE" && (
                           <button
                             onClick={() => handleDeactivate(m.id)}
@@ -399,15 +438,11 @@ export default function MembersPage() {
             />
           </div>
 
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Login Password (Default: Member@123)</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Leave blank for Member@123"
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500"
-            />
+          <div className="p-3.5 bg-brand-50 border border-brand-100 rounded-xl flex items-start gap-2.5">
+            <KeyRound className="h-4 w-4 text-brand-500 shrink-0 mt-0.5" />
+            <div className="text-[11px] text-brand-900 leading-relaxed">
+              <span className="font-bold">Initial Member Password:</span> Automatically set to the member&apos;s mobile number. The member will be required to create a new personal password on their first login.
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">

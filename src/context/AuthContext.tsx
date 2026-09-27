@@ -9,6 +9,7 @@ export interface UserSession {
   email: string;
   role: "ADMIN" | "TRAINER" | "MEMBER";
   phone?: string | null;
+  mustChangePassword?: boolean;
   memberProfile?: {
     id: string;
     memberId: string;

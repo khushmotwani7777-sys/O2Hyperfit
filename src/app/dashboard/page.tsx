@@ -22,6 +22,11 @@ import {
   Mail,
   Loader2,
   TrendingUp,
+  Plus,
+  Upload,
+  ShieldCheck,
+  CreditCard,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -260,6 +265,68 @@ export default function DashboardPage() {
         </div>
       }
     >
+      {/* Admin Quick Actions */}
+      {user?.role === "ADMIN" && (
+        <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs mb-8">
+          <div className="flex items-center justify-between mb-3.5">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Admin Quick Actions
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/members"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark-950 text-white hover:bg-dark-900 text-xs font-bold transition shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5 text-brand-500" />
+              <span>Add Member</span>
+            </Link>
+            <Link
+              href="/members/import"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+            >
+              <Upload className="w-3.5 h-3.5 text-brand-500" />
+              <span>Import Members</span>
+            </Link>
+            <Link
+              href="/trainers"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-brand-500" />
+              <span>Add Trainer</span>
+            </Link>
+            <Link
+              href="/memberships"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-brand-500" />
+              <span>Create Plan</span>
+            </Link>
+            <Link
+              href="/payments"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+            >
+              <IndianRupee className="w-3.5 h-3.5 text-brand-500" />
+              <span>Record Payment</span>
+            </Link>
+            <Link
+              href="/assessments"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-brand-500" />
+              <span>Upload BMI</span>
+            </Link>
+            <Link
+              href="/settings"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+            >
+              <Settings className="w-3.5 h-3.5 text-brand-500" />
+              <span>Settings</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* 6 Key Dashboard Cards (as requested) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
         <StatCard

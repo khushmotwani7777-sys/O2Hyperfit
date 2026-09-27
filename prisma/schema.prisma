@@ -27,6 +27,20 @@ enum TrainerStatus {
 enum PlanStatus {
   ACTIVE
   INACTIVE
+  ARCHIVED
+}
+
+enum SalaryType {
+  MONTHLY
+  WEEKLY
+  DAILY
+  HOURLY
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
 }
 
 enum MembershipStatus {
@@ -63,20 +77,22 @@ enum Gender {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  passwordHash String
-  role         Role          @default(MEMBER)
-  name         String
-  phone        String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id                 String        @id @default(uuid())
+  email              String        @unique
+  passwordHash       String
+  role               Role          @default(MEMBER)
+  name               String
+  phone              String?
+  mustChangePassword Boolean       @default(false)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
-  memberProfile  Member?
-  trainerProfile Trainer?
+  memberProfile      Member?
+  trainerProfile     Trainer?
 
   uploadedAssessments BodyAssessment[] @relation("AssessmentUploader")
   recordedProgress    ProgressRecord[] @relation("ProgressRecorder")
+  salaryChanges       SalaryHistory[]  @relation("SalaryChangedBy")
 
   @@index([email])
   @@index([role])
@@ -144,6 +160,7 @@ model MembershipPlan {
   durationMonths Int
   price          Float
   description    String?
+  features       String?
   status         PlanStatus   @default(ACTIVE)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -315,3 +332,103 @@ model BodyAssessment {
   @@index([memberId])
   @@index([assessmentDate])
 }
+
+model GymSettings {
+  id                    String        @id @default("default")
+  gymName               String        @default("O2 HyperFit")
+  tagline               String        @default("MORE SWEAT MORE GLORY")
+  logoUrl               String        @default("/logo.png")
+  address               String        @default("42, Prime Fitness Boulevard, Metro City, India")
+  phone                 String        @default("+91 98765 43210")
+  email                 String        @default("contact@o2hyperfit.com")
+  website               String        @default("https://o2hyperfit.com")
+  openingTime           String        @default("06:00 AM")
+  closingTime           String        @default("10:00 PM")
+  weeklyHolidays        String        @default("Sunday")
+  currency              String        @default("₹")
+  defaultDurationMonths Int           @default(1)
+  defaultPaymentMethod  PaymentMethod @default(UPI)
+  attendanceMode        String        @default("MANUAL")
+  notificationEmail     Boolean       @default(true)
+  notificationSms       Boolean       @default(false)
+  passwordMinLength     Int           @default(6)
+  sessionTimeoutDays    Int           @default(7)
+  forcePasswordChange   Boolean       @default(true)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+model StaffSalary {
+  id               String           @id @default(uuid())
+  employeeId       String           @unique
+  trainerId        String?          @unique
+  name             String
+  role             String
+  salaryType       SalaryType       @default(MONTHLY)
+  salaryAmount     Float
+  paymentFrequency String           @default("Monthly on 1st")
+  joiningDate      DateTime         @default(now())
+  employmentStatus EmploymentStatus @default(ACTIVE)
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  history SalaryHistory[]
+
+  @@index([employmentStatus])
+  @@index([employeeId])
+}
+
+model SalaryHistory {
+  id            String       @id @default(uuid())
+  staffSalaryId String
+  effectiveDate DateTime     @default(now())
+  salaryAmount  Float
+  salaryType    SalaryType
+  notes         String?
+  changedById   String?
+  createdAt     DateTime     @default(now())
+
+  staffSalary StaffSalary @relation(fields: [staffSalaryId], references: [id], onDelete: Cascade)
+  changedBy   User?       @relation("SalaryChangedBy", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([staffSalaryId])
+  @@index([effectiveDate])
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  content   String
+  rating    Int      @default(5)
+  photoUrl  String?
+  order     Int      @default(1)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+model HomePage {
+  id          String   @id @default("default")
+  isPublished Boolean  @default(true)
+  sections    Json
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+}
+
+model HomePageRevision {
+  id            String   @id @default(uuid())
+  versionId     String
+  publishedBy   String
+  publishedAt   DateTime @default(now())
+  changeSummary String
+  data          Json
+  createdAt     DateTime @default(now())
+
+  @@index([versionId])
+  @@index([publishedAt])
+}
+

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import prisma from "@/lib/prisma";
 import { hashPassword, comparePassword, signToken, verifyToken } from "@/lib/auth";
 import { getStorageService } from "@/lib/storage";
-import { Role, Gender, MemberStatus, PaymentMethod, PaymentStatus, AttendanceStatus } from "@prisma/client";
+import { Role, Gender, MemberStatus, PaymentMethod, PaymentStatus, AttendanceStatus, PlanStatus, SalaryType, EmploymentStatus } from "@prisma/client";
 
 describe("O2Hyperfit Core Business Logic & Integration Tests", () => {
   let testMemberId: string;
@@ -236,4 +236,258 @@ describe("O2Hyperfit Core Business Logic & Integration Tests", () => {
       expect(deleted).toBe(true);
     });
   });
+
+  // 7. Member Password Security & First-Login Flow
+  describe("Password Security & Mandatory First Login", () => {
+    it("should create a member with temporary mobile password and mustChangePassword=true", async () => {
+      const randomSuffix = Math.floor(Math.random() * 10000);
+      const testEmail = `sec.member.${randomSuffix}@example.com`;
+      const mobile = "9876543210";
+      const hashedPassword = await hashPassword(mobile);
+
+      const user = await prisma.user.create({
+        data: {
+          email: testEmail,
+          passwordHash: hashedPassword,
+          name: `Security Member ${randomSuffix}`,
+          phone: mobile,
+          role: Role.MEMBER,
+          mustChangePassword: true,
+        },
+      });
+
+      expect(user.mustChangePassword).toBe(true);
+      const isMobileMatch = await comparePassword(mobile, user.passwordHash);
+      expect(isMobileMatch).toBe(true);
+
+      // Verify token includes mustChangePassword
+      const token = await signToken({
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        mustChangePassword: user.mustChangePassword,
+      });
+      const decoded = await verifyToken(token);
+      expect(decoded?.mustChangePassword).toBe(true);
+
+      // Simulate First-Time Password Change
+      const newPassword = "StrongNewPassword@2026";
+      const newHash = await hashPassword(newPassword);
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: newHash,
+          mustChangePassword: false,
+        },
+      });
+
+      expect(updatedUser.mustChangePassword).toBe(false);
+      const isNewPasswordValid = await comparePassword(newPassword, updatedUser.passwordHash);
+      expect(isNewPasswordValid).toBe(true);
+
+      // Clean up
+      await prisma.user.delete({ where: { id: user.id } });
+    });
+
+    it("should allow admin to reset member password to mobile and restore mustChangePassword flag", async () => {
+      const randomSuffix = Math.floor(Math.random() * 10000);
+      const testEmail = `reset.member.${randomSuffix}@example.com`;
+      const mobile = "9876500000";
+
+      const user = await prisma.user.create({
+        data: {
+          email: testEmail,
+          passwordHash: await hashPassword("CustomPassword@999"),
+          name: `Reset Member ${randomSuffix}`,
+          phone: mobile,
+          role: Role.MEMBER,
+          mustChangePassword: false,
+        },
+      });
+
+      expect(user.mustChangePassword).toBe(false);
+
+      // Admin triggers reset
+      const resetHash = await hashPassword(mobile);
+      const resetUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: resetHash,
+          mustChangePassword: true,
+        },
+      });
+
+      expect(resetUser.mustChangePassword).toBe(true);
+      expect(await comparePassword(mobile, resetUser.passwordHash)).toBe(true);
+
+      // Clean up
+      await prisma.user.delete({ where: { id: user.id } });
+    });
+  });
+
+  // 8. Admin Settings
+  describe("Admin Gym Settings", () => {
+    it("should fetch or upsert gym configuration settings", async () => {
+      const settings = await prisma.gymSettings.upsert({
+        where: { id: "default" },
+        update: {
+          gymName: "O2 HyperFit - Elite",
+          tagline: "MORE SWEAT MORE GLORY",
+        },
+        create: {
+          id: "default",
+          gymName: "O2 HyperFit - Elite",
+          tagline: "MORE SWEAT MORE GLORY",
+        },
+      });
+
+      expect(settings).toBeDefined();
+      expect(settings.gymName).toBe("O2 HyperFit - Elite");
+      expect(settings.tagline).toBe("MORE SWEAT MORE GLORY");
+      expect(settings.logoUrl).toBeDefined();
+    });
+  });
+
+  // 9. Membership Plan Management & Archiving
+  describe("Membership Plan Catalog & Archiving", () => {
+    let createdPlanId: string;
+
+    it("should create a new plan with features array and custom pricing", async () => {
+      const plan = await prisma.membershipPlan.create({
+        data: {
+          name: "Annual VIP Elite",
+          durationMonths: 12,
+          price: 18000,
+          description: "All access VIP plan with steam and trainer access",
+          features: ["Full gym access", "Steam & sauna", "Personal locker", "1 Free InBody Scan/mo"].join(", "),
+          status: PlanStatus.ACTIVE,
+        },
+      });
+
+      expect(plan.id).toBeDefined();
+      expect(plan.name).toBe("Annual VIP Elite");
+      expect(plan.price).toBe(18000);
+      expect(plan.features).toContain("Steam & sauna");
+      expect(plan.status).toBe(PlanStatus.ACTIVE);
+
+      createdPlanId = plan.id;
+    });
+
+    it("should safely soft-archive a membership plan instead of deleting it", async () => {
+      const archived = await prisma.membershipPlan.update({
+        where: { id: createdPlanId },
+        data: { status: PlanStatus.ARCHIVED },
+      });
+
+      expect(archived.status).toBe(PlanStatus.ARCHIVED);
+
+      // Verify active plans query filters out ARCHIVED
+      const activePlans = await prisma.membershipPlan.findMany({
+        where: { status: PlanStatus.ACTIVE },
+      });
+      expect(activePlans.some((p) => p.id === createdPlanId)).toBe(false);
+
+      // Cleanup test plan
+      await prisma.membershipPlan.delete({ where: { id: createdPlanId } });
+    });
+  });
+
+  // 10. Staff & Trainer Salary Register
+  describe("Staff Salary Management & Audit Trail", () => {
+    let testStaffId: string;
+
+    it("should register staff salary and record audit history upon increment", async () => {
+      const employeeId = `EMP-TEST-${Date.now()}`;
+      const staff = await prisma.staffSalary.create({
+        data: {
+          employeeId,
+          name: "Coach Vikram Singh",
+          role: "Head Trainer",
+          salaryType: SalaryType.MONTHLY,
+          salaryAmount: 45000,
+          paymentFrequency: "Monthly on 1st",
+          employmentStatus: EmploymentStatus.ACTIVE,
+          notes: "Initial appointment package",
+        },
+      });
+
+      expect(staff.id).toBeDefined();
+      expect(staff.salaryAmount).toBe(45000);
+      expect(staff.salaryType).toBe(SalaryType.MONTHLY);
+      testStaffId = staff.id;
+
+      // Create salary increment and record in SalaryHistory
+      const newSalary = 50000;
+      await prisma.staffSalary.update({
+        where: { id: testStaffId },
+        data: { salaryAmount: newSalary },
+      });
+
+      const historyRecord = await prisma.salaryHistory.create({
+        data: {
+          staffSalaryId: testStaffId,
+          effectiveDate: new Date(),
+          salaryAmount: newSalary,
+          salaryType: SalaryType.MONTHLY,
+          notes: "Annual appraisal promotion",
+        },
+      });
+
+      expect(historyRecord.id).toBeDefined();
+      expect(historyRecord.salaryAmount).toBe(50000);
+
+      const historyList = await prisma.salaryHistory.findMany({
+        where: { staffSalaryId: testStaffId },
+      });
+      expect(historyList.length).toBeGreaterThanOrEqual(1);
+
+      // Cleanup
+      await prisma.staffSalary.delete({ where: { id: testStaffId } });
+    });
+  });
+
+  // 11. Home Page CMS & Revision Tracking
+  describe("Visual CMS & Revision Management", () => {
+    it("should save and retrieve published homepage configuration and store revisions", async () => {
+      const homePage = await prisma.homePage.upsert({
+        where: { id: "default" },
+        update: {
+          isPublished: true,
+          sections: {
+            hero: { enabled: true, headline: "MORE SWEAT MORE GLORY", order: 1 },
+            plans: { enabled: true, title: "Our Memberships", order: 2 },
+          },
+        },
+        create: {
+          id: "default",
+          isPublished: true,
+          sections: {
+            hero: { enabled: true, headline: "MORE SWEAT MORE GLORY", order: 1 },
+            plans: { enabled: true, title: "Our Memberships", order: 2 },
+          },
+        },
+      });
+
+      expect(homePage.id).toBe("default");
+      expect(homePage.isPublished).toBe(true);
+
+      // Record snapshot revision
+      const revision = await prisma.homePageRevision.create({
+        data: {
+          versionId: `v-${Date.now()}`,
+          publishedBy: "Admin",
+          changeSummary: "Updated hero headline",
+          data: homePage.sections as any,
+        },
+      });
+
+      expect(revision.id).toBeDefined();
+      expect(revision.publishedBy).toBe("Admin");
+
+      // Cleanup revision
+      await prisma.homePageRevision.delete({ where: { id: revision.id } });
+    });
+  });
 });
+

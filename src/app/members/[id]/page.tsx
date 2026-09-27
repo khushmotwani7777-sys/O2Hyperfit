@@ -24,6 +24,7 @@ import {
   Trash2,
   UploadCloud,
   FileText,
+  KeyRound,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -130,18 +131,50 @@ export default function MemberProfilePage() {
     );
   }
 
+  const handleResetPassword = async () => {
+    if (!member) return;
+    if (!confirm(`Reset temporary password for ${member.fullName} to their mobile number (${member.phone})?\n\nThey will be required to set a new password on their next login.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/members/${member.id}/reset-password`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(data.message);
+      } else {
+        alert(data.error || "Failed to reset password");
+      }
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    }
+  };
+
   return (
     <AppLayout
       title={member.fullName}
       subtitle={`Member Profile: ${member.memberId}`}
       actions={
-        <Link
-          href="/members"
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark-900 hover:bg-dark-800 text-white text-xs font-bold uppercase tracking-wider transition"
-        >
-          <ArrowLeft className="h-3.5 w-3.5 text-brand-500" />
-          Member Directory
-        </Link>
+        <div className="flex items-center gap-2">
+          {user?.role === "ADMIN" && (
+            <button
+              onClick={handleResetPassword}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 text-xs font-bold uppercase tracking-wider transition border border-amber-500/20"
+              title="Reset password to mobile number"
+            >
+              <KeyRound className="h-3.5 w-3.5 text-amber-600" />
+              Reset Password
+            </button>
+          )}
+          <Link
+            href="/members"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark-900 hover:bg-dark-800 text-white text-xs font-bold uppercase tracking-wider transition"
+          >
+            <ArrowLeft className="h-3.5 w-3.5 text-brand-500" />
+            Member Directory
+          </Link>
+        </div>
       }
     >
       {/* Profile Header Card */}

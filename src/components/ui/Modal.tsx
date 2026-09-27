@@ -7,11 +7,12 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   children: React.ReactNode;
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl";
 }
 
-export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: ModalProps) {
+export function Modal({ isOpen, onClose, title, description, children, maxWidth = "md" }: ModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -48,7 +49,10 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
           className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidthClasses} border border-slate-100`}
         >
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50/50">
-            <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
+              {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
+            </div>
             <button
               onClick={onClose}
               className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"

@@ -103,9 +103,10 @@ export async function POST(req: NextRequest) {
     const memberCount = await prisma.member.count();
     const memberId = `MEM-${String(memberCount + 1).padStart(3, "0")}`;
 
-    // Create user account for member login
-    const defaultPassword = data.password || "Member@123";
-    const passwordHash = await hashPassword(defaultPassword);
+    // Initial password = member's mobile number, securely hashed, with mustChangePassword = true
+    const cleanPhone = data.phone.replace(/[^0-9]/g, "").slice(-10) || data.phone;
+    const initialPassword = cleanPhone;
+    const passwordHash = await hashPassword(initialPassword);
 
     const user = await prisma.user.create({
       data: {
@@ -114,6 +115,7 @@ export async function POST(req: NextRequest) {
         name: data.fullName,
         phone: data.phone,
         role: Role.MEMBER,
+        mustChangePassword: true,
       },
     });
 

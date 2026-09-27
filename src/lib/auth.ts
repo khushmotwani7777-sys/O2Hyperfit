@@ -14,6 +14,7 @@ export interface TokenPayload {
   email: string;
   name: string;
   role: Role;
+  mustChangePassword?: boolean;
   memberId?: string; // If role is MEMBER
   trainerId?: string; // If role is TRAINER
 }

@@ -1,4 +1,4 @@
-import { PrismaClient, Role, MemberStatus, TrainerStatus, PlanStatus, MembershipStatus, PaymentMethod, PaymentStatus, AttendanceStatus, Gender } from "@prisma/client";
+import { PrismaClient, Role, MemberStatus, TrainerStatus, PlanStatus, MembershipStatus, PaymentMethod, PaymentStatus, AttendanceStatus, Gender, SalaryType, EmploymentStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
@@ -9,6 +9,12 @@ async function main() {
   console.log("🌱 Starting O2Hyperfit database seeding...");
 
   // Clean existing data in reverse order of dependencies
+  await prisma.salaryHistory.deleteMany();
+  await prisma.staffSalary.deleteMany();
+  await prisma.homePageRevision.deleteMany();
+  await prisma.homePage.deleteMany();
+  await prisma.testimonial.deleteMany();
+  await prisma.gymSettings.deleteMany();
   await prisma.bodyAssessment.deleteMany();
   await prisma.progressRecord.deleteMany();
   await prisma.workoutExercise.deleteMany();
@@ -657,6 +663,245 @@ async function main() {
       pdfPath: "assessments/" + pdfFile2,
       uploadedById: adminUser.id,
       notes: "Quarterly Tanita MC-780 assessment. Excellent hydration and visceral fat rating.",
+    },
+  });
+
+  // 10. Seed Gym Settings
+  await prisma.gymSettings.create({
+    data: {
+      id: "default",
+      gymName: "O2 HyperFit",
+      tagline: "MORE SWEAT MORE GLORY",
+      logoUrl: "/logo.png",
+      address: "42, Prime Fitness Boulevard, Metro City, India",
+      phone: "+91 98765 43210",
+      email: "contact@o2hyperfit.com",
+      website: "https://o2hyperfit.com",
+      openingTime: "06:00 AM",
+      closingTime: "10:00 PM",
+      weeklyHolidays: "Sunday",
+      currency: "₹",
+      defaultDurationMonths: 1,
+      defaultPaymentMethod: PaymentMethod.UPI,
+      attendanceMode: "MANUAL",
+      notificationEmail: true,
+      notificationSms: false,
+      passwordMinLength: 6,
+      sessionTimeoutDays: 7,
+      forcePasswordChange: true,
+    },
+  });
+
+  // 11. Seed Staff Salary & History
+  const salary1 = await prisma.staffSalary.create({
+    data: {
+      employeeId: "EMP-001",
+      trainerId: trainer1.id,
+      name: "Marcus Stone",
+      role: "Head Strength Coach",
+      salaryType: SalaryType.MONTHLY,
+      salaryAmount: 45000,
+      paymentFrequency: "Monthly on 1st",
+      joiningDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+      employmentStatus: EmploymentStatus.ACTIVE,
+      notes: "Senior coach leading athletic strength conditioning and client onboarding.",
+    },
+  });
+
+  await prisma.salaryHistory.create({
+    data: {
+      staffSalaryId: salary1.id,
+      effectiveDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+      salaryAmount: 40000,
+      salaryType: SalaryType.MONTHLY,
+      notes: "Initial probation package upon joining.",
+      changedById: adminUser.id,
+    },
+  });
+
+  await prisma.salaryHistory.create({
+    data: {
+      staffSalaryId: salary1.id,
+      effectiveDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      salaryAmount: 45000,
+      salaryType: SalaryType.MONTHLY,
+      notes: "Promotion to Head Strength Coach following quarterly review.",
+      changedById: adminUser.id,
+    },
+  });
+
+  const salary2 = await prisma.staffSalary.create({
+    data: {
+      employeeId: "EMP-002",
+      trainerId: trainer2.id,
+      name: "Sarah Jenkins",
+      role: "Mobility & Nutrition Specialist",
+      salaryType: SalaryType.MONTHLY,
+      salaryAmount: 38000,
+      paymentFrequency: "Monthly on 1st",
+      joiningDate: new Date(Date.now() - 240 * 24 * 60 * 60 * 1000),
+      employmentStatus: EmploymentStatus.ACTIVE,
+      notes: "Focuses on client nutrition protocols, mobility, and high-intensity interval training.",
+    },
+  });
+
+  await prisma.salaryHistory.create({
+    data: {
+      staffSalaryId: salary2.id,
+      effectiveDate: new Date(Date.now() - 240 * 24 * 60 * 60 * 1000),
+      salaryAmount: 38000,
+      salaryType: SalaryType.MONTHLY,
+      notes: "Standard package for certified nutritionist & functional coach.",
+      changedById: adminUser.id,
+    },
+  });
+
+  // 12. Seed Testimonials
+  await prisma.testimonial.createMany({
+    data: [
+      {
+        name: "Vikram Rathore",
+        content: "O2 HyperFit completely shifted my mindset on training. The InBody scans coupled with Marcus's programming helped me drop 8% body fat in 4 months.",
+        rating: 5,
+        photoUrl: "",
+        order: 1,
+        isActive: true,
+      },
+      {
+        name: "Ananya Deshmukh",
+        content: "The dark athletic atmosphere, Olympic-grade barbells, and clean recovery zones make this the best gym I've trained at in over 6 years.",
+        rating: 5,
+        photoUrl: "",
+        order: 2,
+        isActive: true,
+      },
+      {
+        name: "Rohan Mehra",
+        content: "Real tracking, zero fluff. The workout builder and attendance console on the member portal keeps me disciplined every single day.",
+        rating: 5,
+        photoUrl: "",
+        order: 3,
+        isActive: true,
+      },
+    ],
+  });
+
+  // 13. Seed Default HomePage Configuration
+  const defaultHomepageSections = {
+    sectionOrder: ["hero", "stats", "features", "assessments", "memberships", "trainers", "testimonials", "about", "cta", "contact", "footer"],
+    sectionVisibility: {
+      hero: true,
+      stats: true,
+      features: true,
+      assessments: true,
+      memberships: true,
+      trainers: true,
+      testimonials: true,
+      about: true,
+      cta: true,
+      contact: true,
+      footer: true,
+    },
+    hero: {
+      smallHeading: "MORE SWEAT MORE GLORY",
+      mainHeading: "TRAIN. TRACK. TRANSFORM.",
+      highlightedText: "REACH YOUR PEAK",
+      description: "The elite athletic sanctuary engineered for real performance. Experience next-generation coaching, real-time biometric analytics, and high-intensity precision training.",
+      primaryBtnText: "GET STARTED",
+      primaryBtnAction: "/login",
+      secondaryBtnText: "EXPLORE PLANS",
+      secondaryBtnAction: "#memberships",
+      bgImageUrl: "",
+    },
+    stats: {
+      title: "PROVEN AT SCALE",
+      items: [
+        { id: "stat_members", label: "Active Members", value: "500+", isDynamic: true, visible: true },
+        { id: "stat_trainers", label: "Certified Coaches", value: "15+", isDynamic: true, visible: true },
+        { id: "stat_workouts", label: "Workouts Completed", value: "12,000+", isDynamic: true, visible: true },
+        { id: "stat_plans", label: "Membership Tiers", value: "4", isDynamic: true, visible: true },
+      ],
+    },
+    features: {
+      title: "BUILT FOR PEAK ATHLETES",
+      description: "Every tool you need to shatter plateaus and master your physical potential.",
+      items: [
+        { id: "feat_1", title: "Precision Member Management", description: "Seamless profile tracking, membership renewals, and real-time attendance.", icon: "Users", visible: true },
+        { id: "feat_2", title: "Pro Coaching Console", description: "Certified trainers assigning personalized regimens and tracking day-to-day progress.", icon: "ShieldCheck", visible: true },
+        { id: "feat_3", title: "Automated Billing & Invoices", description: "Instant digital receipts across UPI, Card, Cash, with automatic expiry alerts.", icon: "CreditCard", visible: true },
+        { id: "feat_4", title: "Real-Time Check-In Hub", description: "Live floor headcount and attendance auditing for maximum safety and accountability.", icon: "CalendarCheck", visible: true },
+        { id: "feat_5", title: "Custom Workout Builder", description: "Targeted muscle group exercise library with sets, reps, load, and rest timers.", icon: "Dumbbell", visible: true },
+        { id: "feat_6", title: "Body Composition Analytics", description: "Machine PDF integration (InBody / Tanita) with historical metric visualization.", icon: "FileSpreadsheet", visible: true },
+      ],
+    },
+    assessments: {
+      title: "CLINICAL BODY COMPOSITION & BMI",
+      description: "Direct integration with Tanita & InBody medical-grade analyzers for absolute transparency in body fat %, muscle mass, and metabolic rate.",
+      visible: true,
+    },
+    memberships: {
+      title: "MEMBERSHIP TIERS",
+      description: "Transparent, performance-driven investment in your health. No hidden fees.",
+      visible: true,
+    },
+    about: {
+      heading: "ABOUT O2 HYPERFIT",
+      description: "O2 HyperFit was founded on one unshakeable conviction: generic fitness produces generic results.",
+      gymStory: "Our facility pairs Olympic-standard strength apparatus with cutting-edge biometrics, certified elite trainers, and an uncompromising dark athletic atmosphere designed to foster discipline and peak output.",
+      imageUrl: "",
+      visible: true,
+    },
+    trainers: {
+      title: "MEET OUR ELITE COACHES",
+      description: "Master trainers with proven track records in powerlifting, athletic conditioning, and clinical fat loss.",
+      selectedTrainerIds: [],
+      visible: true,
+    },
+    testimonials: {
+      title: "ATHLETE TRANSFORMATIONS",
+      description: "Real words from the dedicated members who put in the sweat every single day.",
+      visible: true,
+    },
+    cta: {
+      heading: "READY TO TRANSCEND YOUR LIMITS?",
+      description: "Join the O2 HyperFit movement today. Step inside, crush your barriers, and experience the highest standard of fitness.",
+      btnText: "START YOUR JOURNEY",
+      btnAction: "/login",
+      bgImageUrl: "",
+      visible: true,
+    },
+    contact: {
+      address: "42, Prime Fitness Boulevard, Metro City, India",
+      phone: "+91 98765 43210",
+      email: "contact@o2hyperfit.com",
+      openingHours: "Mon-Sat: 06:00 AM - 10:00 PM | Sun: Closed",
+      mapsUrl: "https://maps.google.com",
+      instagramUrl: "https://instagram.com",
+      facebookUrl: "https://facebook.com",
+      whatsappUrl: "https://whatsapp.com",
+      visible: true,
+    },
+    footer: {
+      description: "O2 HyperFit is a premier strength, conditioning, and biometric fitness center engineered for peak athletic performance.",
+      copyrightText: "© 2026 O2 HyperFit. All Rights Reserved. Built for champions.",
+      visible: true,
+    },
+  };
+
+  await prisma.homePage.create({
+    data: {
+      id: "default",
+      isPublished: true,
+      sections: defaultHomepageSections,
+    },
+  });
+
+  await prisma.homePageRevision.create({
+    data: {
+      versionId: "REV-001",
+      publishedBy: "Alex Vance (Admin)",
+      changeSummary: "Initial official O2 HyperFit launch layout",
+      data: defaultHomepageSections,
     },
   });
 

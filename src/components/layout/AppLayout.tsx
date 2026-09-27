@@ -7,6 +7,7 @@ import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
+import { ForcePasswordChangeModal } from "@/components/auth/ForcePasswordChangeModal";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -55,6 +56,11 @@ export function AppLayout({
 
   if (!user) {
     return null;
+  }
+
+  // Force password change on first login or after admin reset
+  if (user.mustChangePassword) {
+    return <ForcePasswordChangeModal />;
   }
 
   // Check role restrictions

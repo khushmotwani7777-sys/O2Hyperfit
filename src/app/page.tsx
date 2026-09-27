@@ -26,12 +26,16 @@ import {
   MapPin,
   Phone,
   Mail,
+  Star,
 } from "lucide-react";
+import { defaultHomepageConfig } from "@/lib/homepageConfig";
 
 export default function LandingPage() {
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sections, setSections] = useState<any>(defaultHomepageConfig);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [statsData, setStatsData] = useState({
     activeMembers: 120,
     trainers: 12,
@@ -49,19 +53,29 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    async function loadStats() {
+    async function loadData() {
       try {
-        const res = await fetch("/api/stats/public");
-        const json = await res.json();
-        if (json.success) {
-          if (json.stats) setStatsData(json.stats);
-          if (json.plans) setPlans(json.plans);
+        const [resStats, resHome] = await Promise.all([
+          fetch("/api/stats/public"),
+          fetch("/api/homepage"),
+        ]);
+        const [jsonStats, jsonHome] = await Promise.all([
+          resStats.json(),
+          resHome.json(),
+        ]);
+        if (jsonStats.success) {
+          if (jsonStats.stats) setStatsData(jsonStats.stats);
+          if (jsonStats.plans) setPlans(jsonStats.plans);
+        }
+        if (jsonHome.success) {
+          if (jsonHome.data) setSections(jsonHome.data);
+          if (jsonHome.testimonials) setTestimonials(jsonHome.testimonials);
         }
       } catch (err) {
         console.error("Stats fetch error", err);
       }
     }
-    loadStats();
+    loadData();
   }, []);
 
   return (
@@ -278,80 +292,84 @@ export default function LandingPage() {
           {/* Tagline Pill */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-dark-850 border border-brand-500/40 text-brand-500 text-xs font-bold tracking-widest uppercase mb-6 shadow-md shadow-brand-500/10">
             <Flame className="h-3.5 w-3.5" />
-            <span>MORE THAN A GYM, IT&apos;S A LIFESTYLE !</span>
+            <span>{sections.hero?.smallHeading || "MORE THAN A GYM, IT'S A LIFESTYLE !"}</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] text-white uppercase mb-6">
-            MORE THAN A GYM. <br />
-            <span className="text-brand-500">IT&apos;S A LIFESTYLE.</span>
+            {sections.hero?.mainHeading || "MORE THAN A GYM."} <br />
+            <span className="text-brand-500">
+              {sections.hero?.highlightedText || "IT'S A LIFESTYLE."}
+            </span>
           </h1>
 
           {/* Supporting Text */}
           <p className="text-lg sm:text-2xl font-medium text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Train harder. Track smarter. Transform better.
+            {sections.hero?.description || "Train harder. Track smarter. Transform better."}
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <Link
-              href="/login"
+              href={sections.hero?.primaryBtnAction || "/login"}
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-black text-sm uppercase tracking-wider transition-all shadow-xl shadow-brand-500/30 hover:shadow-brand-500/50 flex items-center justify-center gap-2 group cursor-pointer"
             >
-              <span>GET STARTED</span>
+              <span>{sections.hero?.primaryBtnText || "GET STARTED"}</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
 
             <Link
-              href="#features"
+              href={sections.hero?.secondaryBtnAction || "#features"}
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-dark-850 hover:bg-dark-800 text-white border border-dark-700 hover:border-brand-500/50 font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center cursor-pointer"
             >
-              EXPLORE THE GYM
+              {sections.hero?.secondaryBtnText || "EXPLORE THE GYM"}
             </Link>
           </div>
         </div>
       </section>
 
       {/* 3. HERO STATISTICS SECTION */}
-      <section className="relative z-20 -mt-8 max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="bg-dark-900 border border-dark-700 rounded-3xl p-6 sm:p-8 shadow-2xl grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-          <div className="p-4 border-r border-dark-800 last:border-r-0">
-            <span className="text-3xl sm:text-4xl font-black text-brand-500 block mb-1">
-              {statsData.activeMembers}+
-            </span>
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-              ACTIVE MEMBERS
-            </span>
-          </div>
+      {sections.sectionVisibility?.stats !== false && (
+        <section className="relative z-20 -mt-8 max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="bg-dark-900 border border-dark-700 rounded-3xl p-6 sm:p-8 shadow-2xl grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div className="p-4 border-r border-dark-800 last:border-r-0">
+              <span className="text-3xl sm:text-4xl font-black text-brand-500 block mb-1">
+                {statsData.activeMembers}+
+              </span>
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                ACTIVE MEMBERS
+              </span>
+            </div>
 
-          <div className="p-4 border-r border-dark-800 last:border-r-0">
-            <span className="text-3xl sm:text-4xl font-black text-white block mb-1">
-              {statsData.trainers}+
-            </span>
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-              CERTIFIED TRAINERS
-            </span>
-          </div>
+            <div className="p-4 border-r border-dark-800 last:border-r-0">
+              <span className="text-3xl sm:text-4xl font-black text-white block mb-1">
+                {statsData.trainers}+
+              </span>
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                CERTIFIED TRAINERS
+              </span>
+            </div>
 
-          <div className="p-4 border-r border-dark-800 last:border-r-0">
-            <span className="text-3xl sm:text-4xl font-black text-brand-500 block mb-1">
-              {statsData.workoutsTracked}+
-            </span>
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-              WORKOUTS TRACKED
-            </span>
-          </div>
+            <div className="p-4 border-r border-dark-800 last:border-r-0">
+              <span className="text-3xl sm:text-4xl font-black text-brand-500 block mb-1">
+                {statsData.workoutsTracked}+
+              </span>
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                WORKOUTS TRACKED
+              </span>
+            </div>
 
-          <div className="p-4">
-            <span className="text-3xl sm:text-4xl font-black text-white block mb-1">
-              {statsData.plansCount}
-            </span>
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-              MEMBERSHIP PLANS
-            </span>
+            <div className="p-4">
+              <span className="text-3xl sm:text-4xl font-black text-white block mb-1">
+                {plans.length > 0 ? plans.length : statsData.plansCount}
+              </span>
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                MEMBERSHIP PLANS
+              </span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 4. FEATURES SECTION ("EVERYTHING YOU NEED TO TRAIN BETTER") */}
       <section id="features" className="py-24 sm:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -682,85 +700,141 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 7. ABOUT & CONTACT SECTION */}
-      <section id="about" className="py-24 bg-dark-900 border-t border-dark-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
+      {/* TESTIMONIALS SECTION */}
+      {sections.sectionVisibility?.testimonials !== false && testimonials.length > 0 && (
+        <section id="testimonials" className="py-24 bg-dark-900 border-t border-dark-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
               <span className="text-xs font-bold text-brand-500 uppercase tracking-widest block mb-2">
-                ABOUT O2 HYPERFIT
+                VERIFIED ATHLETE REVIEWS
               </span>
-              <h2 className="text-3xl sm:text-4xl font-black uppercase text-white mb-6">
-                MORE THAN A GYM, <br />
-                <span className="text-brand-500">IT&apos;S A LIFESTYLE !</span>
+              <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-white mb-4">
+                {sections.testimonials?.title || "ATHLETE TRANSFORMATIONS"}
               </h2>
-              <p className="text-slate-300 text-sm leading-relaxed mb-4">
-                At O2 HyperFit, we believe elite fitness is not a seasonal habit—it is a lifelong commitment.
-                Our training facility combines world-class biomechanical equipment, certified strength and hypertrophy coaches, and scientific body composition tracking to help you break through plateaus.
+              <p className="text-slate-400 text-sm sm:text-base">
+                {sections.testimonials?.description || "Real words from the dedicated members who put in the sweat every single day."}
               </p>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                From our dedicated InBody & Tanita scanning station to personalized nutrition and workout split assignment, every member receives personalized guidance tailored to their exact physiology.
-              </p>
-
-              <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-300">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-brand-500" />
-                  <span>Biomechanical Equipment</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-brand-500" />
-                  <span>Certified Personal Trainers</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-brand-500" />
-                  <span>Machine BMI PDF Tracking</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-brand-500" />
-                  <span>Sauna & Recovery Zones</span>
-                </div>
-              </div>
             </div>
 
-            <div id="contact" className="bg-dark-950 p-8 rounded-3xl border border-dark-700 flex flex-col justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-white mb-6">Visit Our Facility</h3>
-                <div className="space-y-4 text-sm text-slate-300">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-brand-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-bold text-white">O2 HyperFit Main Studio</p>
-                      <p className="text-slate-400 text-xs">Plot 42, 100 Feet Road, Indiranagar, Bangalore, 560038</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonials.map((t) => (
+                <div
+                  key={t.id}
+                  className="p-6 rounded-3xl bg-dark-950 border border-dark-750 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center gap-1 text-amber-400 mb-3">
+                      {Array.from({ length: t.rating || 5 }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-amber-400" />
+                      ))}
                     </div>
+                    <p className="text-slate-300 text-sm italic leading-relaxed mb-6">
+                      &quot;{t.content}&quot;
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-brand-500 shrink-0" />
-                    <span className="text-slate-300">+91 98765 43210 / +91 80 4123 4567</span>
+                  <div className="pt-4 border-t border-dark-800">
+                    <span className="font-bold text-white text-sm block">{t.name}</span>
+                    <span className="text-[11px] text-brand-500 font-semibold uppercase tracking-wider">
+                      Verified Member
+                    </span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-brand-500 shrink-0" />
-                    <span className="text-slate-300">contact@o2hyperfit.com</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 7. ABOUT & CONTACT SECTION */}
+      {sections.sectionVisibility?.about !== false && (
+        <section id="about" className="py-24 bg-dark-950 border-t border-dark-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div>
+                <span className="text-xs font-bold text-brand-500 uppercase tracking-widest block mb-2">
+                  ABOUT O2 HYPERFIT
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-black uppercase text-white mb-6">
+                  {sections.about?.heading || "MORE THAN A GYM,"} <br />
+                  <span className="text-brand-500">IT&apos;S A LIFESTYLE !</span>
+                </h2>
+                <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                  {sections.about?.description ||
+                    "At O2 HyperFit, we believe elite fitness is not a seasonal habit—it is a lifelong commitment. Our training facility combines world-class biomechanical equipment, certified strength and hypertrophy coaches, and scientific body composition tracking to help you break through plateaus."}
+                </p>
+                <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                  {sections.about?.gymStory ||
+                    "From our dedicated InBody & Tanita scanning station to personalized nutrition and workout split assignment, every member receives personalized guidance tailored to their exact physiology."}
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-300">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-brand-500" />
+                    <span>Biomechanical Equipment</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-brand-500 shrink-0" />
-                    <span className="text-slate-300">Mon - Sat: 5:30 AM - 10:30 PM | Sun: 7:00 AM - 8:00 PM</span>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-brand-500" />
+                    <span>Certified Personal Trainers</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-brand-500" />
+                    <span>Machine BMI PDF Tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-brand-500" />
+                    <span>Sauna & Recovery Zones</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-dark-800">
-                <Link
-                  href="/login"
-                  className="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-brand-500/25"
-                >
-                  <span>Member & Staff Portal Login</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+              <div id="contact" className="bg-dark-900 p-8 rounded-3xl border border-dark-700 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-6">Visit Our Facility</h3>
+                  <div className="space-y-4 text-sm text-slate-300">
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-brand-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-white">O2 HyperFit Main Studio</p>
+                        <p className="text-slate-400 text-xs">
+                          {sections.contact?.address || "42, Prime Fitness Boulevard, Metro City, India"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-brand-500 shrink-0" />
+                      <span className="text-slate-300">
+                        {sections.contact?.phone || "+91 98765 43210"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-brand-500 shrink-0" />
+                      <span className="text-slate-300">
+                        {sections.contact?.email || "contact@o2hyperfit.com"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-brand-500 shrink-0" />
+                      <span className="text-slate-300">
+                        {sections.contact?.openingHours || "Mon - Sat: 6:00 AM - 10:00 PM | Sun: Closed"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-dark-800">
+                  <Link
+                    href="/login"
+                    className="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-brand-500/25"
+                  >
+                    <span>Member & Staff Portal Login</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 8. BRANDED FOOTER */}
       <footer className="bg-dark-950 border-t border-dark-800 py-12 text-xs text-slate-400">

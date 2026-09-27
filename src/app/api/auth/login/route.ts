@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       email: user.email,
       name: user.name,
       role: user.role,
+      mustChangePassword: user.mustChangePassword,
       memberId: user.memberProfile?.id,
       trainerId: user.trainerProfile?.id,
     };
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
         name: user.name,
         email: user.email,
         role: user.role,
+        mustChangePassword: user.mustChangePassword,
         memberProfile: user.memberProfile,
         trainerProfile: user.trainerProfile,
       },
