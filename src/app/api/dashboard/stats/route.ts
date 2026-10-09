@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
           },
           bodyAssessments: {
             orderBy: { assessmentDate: "desc" },
-            take: 3,
+            take: 10,
           },
           progressRecords: {
             orderBy: { date: "desc" },

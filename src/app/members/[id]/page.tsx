@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Badge } from "@/components/ui/Badge";
-import { Modal } from "@/components/ui/Modal";
 import { useAuth } from "@/context/AuthContext";
 import {
   User,
@@ -22,11 +21,11 @@ import {
   Plus,
   Loader2,
   Trash2,
-  UploadCloud,
   FileText,
   KeyRound,
 } from "lucide-react";
 import Link from "next/link";
+import { AssessmentVisualization } from "@/components/assessments/AssessmentVisualization";
 
 export default function MemberProfilePage() {
   const params = useParams();
@@ -37,14 +36,6 @@ export default function MemberProfilePage() {
   const [activeTab, setActiveTab] = useState<
     "overview" | "memberships" | "payments" | "attendance" | "workout" | "progress" | "assessments"
   >("overview");
-
-  // Assessment upload state
-  const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
-  const [uploadingPdf, setUploadingPdf] = useState(false);
-  const [assessmentFile, setAssessmentFile] = useState<File | null>(null);
-  const [assessmentDate, setAssessmentDate] = useState(new Date().toISOString().split("T")[0]);
-  const [assessmentNotes, setAssessmentNotes] = useState("");
-  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const fetchMember = async () => {
     try {
@@ -68,40 +59,6 @@ export default function MemberProfilePage() {
       fetchMember();
     }
   }, [params.id]);
-
-  const handleUploadAssessment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!assessmentFile || !member) return;
-    setUploadingPdf(true);
-    setUploadError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", assessmentFile);
-      formData.append("memberId", member.id);
-      formData.append("assessmentDate", assessmentDate);
-      if (assessmentNotes) formData.append("notes", assessmentNotes);
-
-      const res = await fetch("/api/assessments", {
-        method: "POST",
-        body: formData,
-      });
-
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setIsAssessmentModalOpen(false);
-        setAssessmentFile(null);
-        setAssessmentNotes("");
-        fetchMember();
-      } else {
-        setUploadError(json.error || "Failed to upload assessment PDF");
-      }
-    } catch (err: any) {
-      setUploadError(err.message || "Failed to upload assessment");
-    } finally {
-      setUploadingPdf(false);
-    }
-  };
 
   const handleDeleteAssessment = async (id: string) => {
     if (!confirm("Are you sure you want to delete this assessment report?")) return;
@@ -460,162 +417,26 @@ export default function MemberProfilePage() {
         </div>
       )}
 
-      {/* Tab 7: Body Assessments */}
+      {/* Tab 7: Body Assessments (Admin View-Only) */}
       {activeTab === "assessments" && (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-black uppercase tracking-tight text-slate-900">
-                BMI & Body Composition PDF Reports
+                Body Composition & BMI Reports
               </h3>
               <p className="text-xs text-slate-500">
-                Machine-generated InBody, Tanita, or Accuniq body scan reports
+                Verified assessment records and progress analytics for {member.fullName} ({member.memberId})
               </p>
             </div>
-            {user?.role !== "MEMBER" && (
-              <button
-                onClick={() => setIsAssessmentModalOpen(true)}
-                className="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition shadow-sm"
-              >
-                <UploadCloud className="h-4 w-4" />
-                UPLOAD ASSESSMENT
-              </button>
-            )}
+            <div className="px-3 py-1 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wider">
+              View Only
+            </div>
           </div>
 
-          {/* Assessment History Table */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-            {member.bodyAssessments?.length === 0 ? (
-              <div className="p-12 text-center text-slate-400 text-xs">
-                No body assessments uploaded for this member yet.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
-                    <tr>
-                      <th className="py-3 px-4">Assessment Date</th>
-                      <th className="py-3 px-4">PDF File</th>
-                      <th className="py-3 px-4">Uploaded By</th>
-                      <th className="py-3 px-4">Notes</th>
-                      <th className="py-3 px-4 text-right">View PDF</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {member.bodyAssessments?.map((ass: any) => (
-                      <tr key={ass.id} className="hover:bg-slate-50/50">
-                        <td className="py-3.5 px-4 font-bold text-slate-900">
-                          {new Date(ass.assessmentDate).toLocaleDateString()}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-brand-500" />
-                            <span className="font-semibold text-slate-800">{ass.pdfFileName}</span>
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-4 text-slate-600">
-                          {ass.uploadedBy?.name || "Staff"}
-                        </td>
-                        <td className="py-3.5 px-4 text-slate-500 italic max-w-xs truncate">
-                          {ass.notes || "-"}
-                        </td>
-                        <td className="py-3.5 px-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <a
-                              href={ass.pdfUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-1.5 rounded-lg bg-dark-950 text-brand-500 hover:bg-dark-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1 transition"
-                            >
-                              <Download className="h-3.5 w-3.5" />
-                              View PDF
-                            </a>
-                            {user?.role !== "MEMBER" && (
-                              <button
-                                onClick={() => handleDeleteAssessment(ass.id)}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
-                                title="Delete Assessment"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <AssessmentVisualization assessments={member.bodyAssessments || []} isAdminView={true} />
         </div>
       )}
-
-      {/* Upload Assessment Modal */}
-      <Modal
-        isOpen={isAssessmentModalOpen}
-        onClose={() => setIsAssessmentModalOpen(false)}
-        title="Upload Body Composition / BMI PDF"
-      >
-        {uploadError && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
-            {uploadError}
-          </div>
-        )}
-
-        <form onSubmit={handleUploadAssessment} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">Assessment Date *</label>
-            <input
-              type="date"
-              required
-              value={assessmentDate}
-              onChange={(e) => setAssessmentDate(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">Select Machine PDF File *</label>
-            <input
-              type="file"
-              accept=".pdf,application/pdf"
-              required
-              onChange={(e) => setAssessmentFile(e.target.files?.[0] || null)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-dark-950 file:text-brand-500 hover:file:bg-dark-900"
-            />
-            <p className="text-[11px] text-slate-500 mt-1">Upload the raw PDF generated by the BMI / InBody scanner.</p>
-          </div>
-
-          <div>
-            <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">Notes / Trainer Summary</label>
-            <textarea
-              rows={3}
-              value={assessmentNotes}
-              onChange={(e) => setAssessmentNotes(e.target.value)}
-              placeholder="e.g. InBody 570 scan: SMM 36.8kg, Body Fat 16.5%, Visceral Fat level 5..."
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={() => setIsAssessmentModalOpen(false)}
-              className="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 font-bold uppercase"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={uploadingPdf}
-              className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm"
-            >
-              {uploadingPdf ? <Loader2 className="h-4 w-4 animate-spin" /> : "Upload PDF"}
-            </button>
-          </div>
-        </form>
-      </Modal>
     </AppLayout>
   );
 }

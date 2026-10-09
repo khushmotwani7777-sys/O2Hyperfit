@@ -57,112 +57,83 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const navItems: NavItem[] = [
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-    {
-      label: "Home Page",
-      icon: Globe,
-      roles: ["ADMIN"],
-      subItems: [
-        { label: "Edit Home Page", href: "/admin/homepage" },
-        { label: "Preview Live", href: "/admin/homepage?preview=true" },
-        { label: "Published Version", href: "/", external: true },
-        { label: "Revision History", href: "/admin/homepage?tab=revisions" },
-      ],
-    },
-    {
-      label: "Members",
-      icon: Users,
-      roles: ["ADMIN", "TRAINER"],
-      subItems: role === "ADMIN" ? [
-        { label: "All Members", href: "/members" },
-        { label: "Add Member", href: "/members?action=add" },
-        { label: "Import Members", href: "/members/import" },
-      ] : undefined,
-      href: role === "TRAINER" ? "/members" : undefined,
-    },
-    {
-      label: "Memberships",
-      icon: CreditCard,
-      roles: ["ADMIN"],
-      subItems: [
-        { label: "Plans Catalog", href: "/memberships" },
-        { label: "Active Subscriptions", href: "/memberships?tab=active" },
-        { label: "Expired Subscriptions", href: "/memberships?tab=expired" },
-      ],
-    },
-    {
-      label: "Payments",
-      href: "/payments",
-      icon: IndianRupee,
-      roles: ["ADMIN", "MEMBER"],
-    },
-    {
-      label: "Attendance",
-      href: "/attendance",
-      icon: CalendarCheck,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-    {
-      label: "Trainers & Staff",
-      icon: ShieldCheck,
-      roles: ["ADMIN"],
-      subItems: [
-        { label: "Trainers Directory", href: "/trainers" },
-        { label: "Staff Salary", href: "/trainers/salary" },
-      ],
-    },
-    {
-      label: "Workouts",
-      href: "/workouts",
-      icon: Dumbbell,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-    {
-      label: "Exercises",
-      href: "/exercises",
-      icon: BookOpen,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-    {
-      label: "Body Assessments",
-      href: "/assessments",
-      icon: FileSpreadsheet,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-    {
-      label: "Progress",
-      href: "/progress",
-      icon: TrendingUp,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-    {
-      label: "Reports",
-      href: "/dashboard#reports",
-      icon: BarChart3,
-      roles: ["ADMIN"],
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-      icon: Settings,
-      roles: ["ADMIN"],
-    },
-    {
-      label: "My Account",
-      href: "/profile",
-      icon: UserCircle,
-      roles: ["ADMIN", "TRAINER", "MEMBER"],
-    },
-  ];
+  let visibleItems: NavItem[] = [];
 
-  // Filter items by role
-  const visibleItems = navItems.filter((item) => item.roles.includes(role as any));
+  if (role === "MEMBER") {
+    visibleItems = [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["MEMBER"] },
+      { label: "My Profile", href: "/profile", icon: UserCircle, roles: ["MEMBER"] },
+      { label: "Membership", href: "/memberships", icon: CreditCard, roles: ["MEMBER"] },
+      { label: "Attendance", href: "/attendance", icon: CalendarCheck, roles: ["MEMBER"] },
+      { label: "Workout Plan", href: "/workouts", icon: Dumbbell, roles: ["MEMBER"] },
+      { label: "Progress", href: "/progress", icon: TrendingUp, roles: ["MEMBER"] },
+      { label: "Body Assessments", href: "/assessments", icon: FileSpreadsheet, roles: ["MEMBER"] },
+      { label: "Payments", href: "/payments", icon: IndianRupee, roles: ["MEMBER"] },
+    ];
+  } else if (role === "ADMIN") {
+    visibleItems = [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN"] },
+      {
+        label: "Home Page",
+        icon: Globe,
+        roles: ["ADMIN"],
+        subItems: [
+          { label: "Edit Home Page", href: "/admin/homepage" },
+          { label: "Preview Live", href: "/admin/homepage?preview=true" },
+          { label: "Published Version", href: "/", external: true },
+          { label: "Revision History", href: "/admin/homepage?tab=revisions" },
+        ],
+      },
+      {
+        label: "Members",
+        icon: Users,
+        roles: ["ADMIN"],
+        subItems: [
+          { label: "All Members", href: "/members" },
+          { label: "Add Member", href: "/members?action=add" },
+          { label: "Import Members", href: "/members/import" },
+        ],
+      },
+      {
+        label: "Memberships",
+        icon: CreditCard,
+        roles: ["ADMIN"],
+        subItems: [
+          { label: "Plans Catalog", href: "/memberships" },
+          { label: "Active Subscriptions", href: "/memberships?tab=active" },
+          { label: "Expired Subscriptions", href: "/memberships?tab=expired" },
+        ],
+      },
+      { label: "Payments", href: "/payments", icon: IndianRupee, roles: ["ADMIN"] },
+      { label: "Attendance", href: "/attendance", icon: CalendarCheck, roles: ["ADMIN"] },
+      {
+        label: "Trainers & Staff",
+        icon: ShieldCheck,
+        roles: ["ADMIN"],
+        subItems: [
+          { label: "Trainers Directory", href: "/trainers" },
+          { label: "Staff Salary", href: "/trainers/salary" },
+        ],
+      },
+      { label: "Workouts", href: "/workouts", icon: Dumbbell, roles: ["ADMIN"] },
+      { label: "Body Assessments", href: "/assessments", icon: FileSpreadsheet, roles: ["ADMIN"] },
+      { label: "Progress", href: "/progress", icon: TrendingUp, roles: ["ADMIN"] },
+      { label: "Reports", href: "/dashboard#reports", icon: BarChart3, roles: ["ADMIN"] },
+      { label: "Settings", href: "/settings", icon: Settings, roles: ["ADMIN"] },
+    ];
+  } else {
+    // TRAINER
+    visibleItems = [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["TRAINER"] },
+      { label: "Members", href: "/members", icon: Users, roles: ["TRAINER"] },
+      { label: "Attendance", href: "/attendance", icon: CalendarCheck, roles: ["TRAINER"] },
+      { label: "Workouts", href: "/workouts", icon: Dumbbell, roles: ["TRAINER"] },
+      { label: "Exercises", href: "/exercises", icon: BookOpen, roles: ["TRAINER"] },
+      { label: "Body Assessments", href: "/assessments", icon: FileSpreadsheet, roles: ["TRAINER"] },
+      { label: "Progress", href: "/progress", icon: TrendingUp, roles: ["TRAINER"] },
+      { label: "My Profile", href: "/profile", icon: UserCircle, roles: ["TRAINER"] },
+    ];
+  }
 
   return (
     <>
@@ -286,19 +257,30 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               (pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href)));
 
+            const isAssessmentsSpecial = role === "MEMBER" && item.label === "Body Assessments";
+
             return (
               <Link
                 key={item.label}
                 href={item.href || "#"}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                   isActive
                     ? "bg-brand-500 text-white shadow-lg shadow-brand-500/30"
+                    : isAssessmentsSpecial
+                    ? "text-brand-400 bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/30"
                     : "text-slate-300 hover:bg-dark-850 hover:text-white"
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-slate-400"}`} />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-3">
+                  <Icon className={`h-4 w-4 ${isActive ? "text-white" : isAssessmentsSpecial ? "text-brand-500" : "text-slate-400"}`} />
+                  <span>{item.label}</span>
+                </div>
+                {isAssessmentsSpecial && !isActive && (
+                  <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-brand-500 text-white tracking-widest uppercase">
+                    SCAN
+                  </span>
+                )}
               </Link>
             );
           })}

@@ -41,15 +41,40 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAuth(req, [Role.ADMIN, Role.TRAINER]);
+  const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
+
+  // Requirement 1 & 11: Admins cannot upload reports on behalf of members
+  if (auth.user.role === Role.ADMIN) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Admins are not permitted to upload BMI reports on behalf of members. Members must upload their own reports.",
+      },
+      { status: 403 }
+    );
+  }
 
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const memberId = formData.get("memberId") as string | null;
+    let memberId = formData.get("memberId") as string | null;
     const assessmentDate = formData.get("assessmentDate") as string | null;
     const notes = formData.get("notes") as string | null;
+
+    // If caller is MEMBER, ensure they can only upload for their own member profile
+    if (auth.user.role === Role.MEMBER) {
+      const currentMember = await prisma.member.findFirst({
+        where: { userId: auth.user.userId },
+      });
+      if (!currentMember) {
+        return NextResponse.json(
+          { success: false, error: "Member profile not found." },
+          { status: 404 }
+        );
+      }
+      memberId = currentMember.id;
+    }
 
     if (!file || !memberId) {
       return NextResponse.json(
@@ -78,6 +103,18 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // Validate magic bytes
+    if (!buffer.slice(0, 5).toString("ascii").startsWith("%PDF")) {
+      return NextResponse.json(
+        { success: false, error: "The uploaded file is not a valid PDF document." },
+        { status: 400 }
+      );
+    }
+
+    // Parse verifiable metrics from PDF
+    const { parseAssessmentPdf } = await import("@/lib/pdfParser");
+    const extracted = await parseAssessmentPdf(buffer);
+
     // Save using storage service abstraction
     const storageService = getStorageService();
     const uploadResult = await storageService.uploadFile(
@@ -96,6 +133,17 @@ export async function POST(req: NextRequest) {
         pdfUrl: uploadResult.url,
         notes: notes || null,
         uploadedById: auth.user.userId,
+        weightKg: extracted.weightKg,
+        bmi: extracted.bmi,
+        bodyFatPercentage: extracted.bodyFatPercentage,
+        muscleMassKg: extracted.muscleMassKg,
+        bodyWaterPercentage: extracted.bodyWaterPercentage,
+        visceralFat: extracted.visceralFat,
+        boneMassKg: extracted.boneMassKg,
+        bmrKcal: extracted.bmrKcal,
+        bodyAge: extracted.bodyAge,
+        skeletalMusclePercentage: extracted.skeletalMusclePercentage,
+        metrics: extracted.metrics,
       },
       include: {
         member: true,
@@ -103,7 +151,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, data: assessment }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: assessment,
+        extractedMetrics: extracted.metrics,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Upload assessment error:", error);
     return NextResponse.json(
@@ -114,7 +169,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const auth = await requireAuth(req, [Role.ADMIN, Role.TRAINER]);
+  const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
 
   const { searchParams } = new URL(req.url);
@@ -128,6 +183,17 @@ export async function DELETE(req: NextRequest) {
     const assessment = await prisma.bodyAssessment.findUnique({ where: { id } });
     if (!assessment) {
       return NextResponse.json({ success: false, error: "Assessment not found" }, { status: 404 });
+    }
+
+    // Ownership check for Member
+    if (auth.user.role === Role.MEMBER) {
+      const currentMember = await prisma.member.findFirst({ where: { userId: auth.user.userId } });
+      if (!currentMember || currentMember.id !== assessment.memberId) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized. You can only delete your own reports." },
+          { status: 403 }
+        );
+      }
     }
 
     // Delete file from storage

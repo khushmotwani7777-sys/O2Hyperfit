@@ -189,50 +189,89 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* BMI Assessment Reports */}
+          {/* MY BODY ASSESSMENTS */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-black uppercase tracking-tight text-slate-900 text-sm flex items-center gap-2">
-                <FileSpreadsheet className="h-4 w-4 text-brand-500" />
-                BMI & Body Composition Reports
-              </h3>
+              <div>
+                <h3 className="font-black uppercase tracking-tight text-slate-900 text-sm flex items-center gap-2">
+                  <FileSpreadsheet className="h-4 w-4 text-brand-500" />
+                  MY BODY ASSESSMENTS
+                </h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Machine-generated body composition scan history</p>
+              </div>
               <Link
                 href="/assessments"
-                className="text-xs font-bold uppercase tracking-wider text-brand-600 hover:text-brand-700 flex items-center gap-1"
+                className="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
               >
-                All Reports <ArrowUpRight className="h-3.5 w-3.5" />
+                <Plus className="h-3.5 w-3.5" />
+                Upload Report
               </Link>
             </div>
 
             {data?.recentAssessments?.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {data.recentAssessments.map((ass: any) => (
                   <div
                     key={ass.id}
-                    className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/70 bg-slate-50 hover:bg-slate-100/60 transition"
+                    className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100/70 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{ass.pdfFileName}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-black text-slate-900 text-xs">
+                          {new Date(ass.assessmentDate).toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                          Processed
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-slate-800 truncate">{ass.pdfFileName}</p>
                       <p className="text-[11px] text-slate-500">
-                        Scan Date: {new Date(ass.assessmentDate).toLocaleDateString()}
+                        Uploaded: {new Date(ass.createdAt || ass.assessmentDate).toLocaleDateString("en-US", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </p>
-                      {ass.notes && <p className="text-[11px] text-slate-600 mt-1 italic">{ass.notes}</p>}
+                      {ass.notes && <p className="text-[11px] text-slate-600 italic mt-1 bg-white/70 p-2 rounded-lg border border-slate-200/50">{ass.notes}</p>}
                     </div>
-                    <a
-                      href={ass.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-xl bg-brand-500 text-white hover:bg-brand-600 transition shadow-xs flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      PDF
-                    </a>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <a
+                        href={ass.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-xl bg-dark-950 hover:bg-dark-900 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition shadow-xs"
+                      >
+                        <ArrowUpRight className="h-3.5 w-3.5 text-brand-500" />
+                        View Report
+                      </a>
+                      <a
+                        href={ass.pdfUrl}
+                        download
+                        className="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition shadow-xs"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Download
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-slate-400 text-xs font-medium">
-                No BMI scan reports uploaded yet.
+              <div className="text-center py-10 text-slate-400 text-xs font-medium border border-dashed border-slate-200 rounded-2xl">
+                <FileSpreadsheet className="h-8 w-8 mx-auto text-slate-300 mb-2" />
+                <p className="font-semibold text-slate-600">No body assessments submitted yet.</p>
+                <p className="text-[11px] text-slate-400 mt-1">Upload your machine-generated report to track progress.</p>
+                <Link
+                  href="/assessments"
+                  className="mt-3 inline-flex items-center gap-1 px-3.5 py-1.5 bg-brand-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-brand-600 transition"
+                >
+                  Upload First Report
+                </Link>
               </div>
             )}
           </div>
@@ -308,13 +347,6 @@ export default function DashboardPage() {
             >
               <IndianRupee className="w-3.5 h-3.5 text-brand-500" />
               <span>Record Payment</span>
-            </Link>
-            <Link
-              href="/assessments"
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-brand-500" />
-              <span>Upload BMI</span>
             </Link>
             <Link
               href="/settings"
@@ -462,7 +494,7 @@ export default function DashboardPage() {
               href="/assessments"
               className="text-xs font-bold uppercase tracking-wider text-brand-600 hover:text-brand-700 flex items-center gap-1"
             >
-              Upload PDF <ArrowUpRight className="h-3.5 w-3.5" />
+              View Archive <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 

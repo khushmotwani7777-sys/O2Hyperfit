@@ -315,16 +315,30 @@ model ProgressRecord {
 }
 
 model BodyAssessment {
-  id             String   @id @default(uuid())
-  memberId       String
-  assessmentDate DateTime @default(now())
-  pdfFileName    String
-  pdfUrl         String
-  pdfPath        String
-  uploadedById   String?
-  notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                      String   @id @default(uuid())
+  memberId                String
+  assessmentDate          DateTime @default(now())
+  pdfFileName             String
+  pdfUrl                  String
+  pdfPath                 String
+  uploadedById            String?
+  notes                   String?
+
+  // Extracted body composition metrics
+  weightKg                Float?
+  bmi                     Float?
+  bodyFatPercentage       Float?
+  muscleMassKg            Float?
+  bodyWaterPercentage     Float?
+  visceralFat             Float?
+  boneMassKg              Float?
+  bmrKcal                 Float?
+  bodyAge                 Int?
+  skeletalMusclePercentage Float?
+  metrics                 Json?
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   member     Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
   uploadedBy User?  @relation("AssessmentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)

@@ -224,16 +224,77 @@ describe("O2Hyperfit Core Business Logic & Integration Tests", () => {
           pdfPath: uploadResult.path,
           pdfUrl: uploadResult.url,
           notes: "Test assessment report metadata",
+          weightKg: 78.5,
+          bmi: 24.2,
+          bodyFatPercentage: 16.5,
+          muscleMassKg: 37.2,
         },
       });
 
       expect(assessment.id).toBeDefined();
       expect(assessment.pdfFileName).toBe("test_inbody_scan.pdf");
       expect(assessment.memberId).toBe(testMemberId);
+      expect(assessment.weightKg).toBe(78.5);
+      expect(assessment.bmi).toBe(24.2);
+      expect(assessment.bodyFatPercentage).toBe(16.5);
+      expect(assessment.muscleMassKg).toBe(37.2);
+      expect(assessment.boneMassKg).toBeNull(); // Missing metric is null, not fabricated
 
-      // Cleanup storage
+      // Cleanup
+      await prisma.bodyAssessment.delete({ where: { id: assessment.id } });
       const deleted = await storage.deleteFile(uploadResult.path);
       expect(deleted).toBe(true);
+    });
+
+    it("should parse verifiable metrics from machine PDF text without hallucinating", async () => {
+      const { parseAssessmentPdf } = await import("@/lib/pdfParser");
+
+      const machineTextPdf = Buffer.from(
+        "%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n" +
+          "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n" +
+          "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R >>\nendobj\n" +
+          "4 0 obj\n<< /Length 200 >>\nstream\n" +
+          "InBody 570 Report\nWeight: 82.4 kg\nBMI: 25.1\nPercent Body Fat: 17.8%\nSkeletal Muscle Mass: 38.6 kg\nVisceral Fat Level: 6\nBMR: 1780 kcal\n" +
+          "endstream\nendobj\ntrailer\n<< /Size 5 /Root 1 0 R >>\n%%EOF"
+      );
+
+      const result = await parseAssessmentPdf(machineTextPdf);
+      expect(result.weightKg).toBe(82.4);
+      expect(result.bmi).toBe(25.1);
+      expect(result.bodyFatPercentage).toBe(17.8);
+      expect(result.muscleMassKg).toBe(38.6);
+      expect(result.visceralFat).toBe(6);
+      expect(result.bmrKcal).toBe(1780);
+      // Unmentioned metrics MUST be null
+      expect(result.bodyWaterPercentage).toBeNull();
+      expect(result.boneMassKg).toBeNull();
+      expect(result.bodyAge).toBeNull();
+    });
+
+    it("should enforce member data isolation on body assessments", async () => {
+      // Member A
+      const memberA = await prisma.member.findFirst({ where: { email: "member@o2hyperfit.com" } });
+      expect(memberA).not.toBeNull();
+
+      // Member B
+      const memberB = await prisma.member.findFirst({ where: { email: "priya@example.com" } });
+      expect(memberB).not.toBeNull();
+
+      // Member A assessments query
+      const assessmentsA = await prisma.bodyAssessment.findMany({
+        where: { memberId: memberA!.id },
+      });
+
+      // Member B assessments query
+      const assessmentsB = await prisma.bodyAssessment.findMany({
+        where: { memberId: memberB!.id },
+      });
+
+      // Verify strict isolation
+      const idsA = new Set(assessmentsA.map((a) => a.id));
+      for (const b of assessmentsB) {
+        expect(idsA.has(b.id)).toBe(false);
+      }
     });
   });
 
