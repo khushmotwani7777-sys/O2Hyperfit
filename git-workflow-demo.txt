@@ -1,1 +1,1 @@
-Resolved: O2 HyperFit member management and BMI dashboard workflow
+Version A: Member management workflow
