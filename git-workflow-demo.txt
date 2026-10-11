@@ -1,1 +1,1 @@
-Version A: Member management workflow
+Version B: BMI dashboard workflow
